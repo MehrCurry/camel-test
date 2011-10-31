@@ -15,7 +15,7 @@ public class Main {
 
 		context.addRoutes(new RouteBuilder() {
 			public void configure() {
-				from("http://www.apache.org/dyn/closer.cgi/maven/binaries/apache-maven-3.0.3-bin.zip").to("file:data/outbox");
+				from("file:data/inbox").to("file:data/outbox");
 			}
 		});
 		context.start();

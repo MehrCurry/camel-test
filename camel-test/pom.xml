@@ -10,31 +10,32 @@
 	<artifactId>camel-test</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.0.1-SNAPSHOT</version>
-    <issueManagement>
-        <system>JIRA</system>
-        <url>http://builder:8080/jira/</url>
-    </issueManagement>
-    <ciManagement>
-        <system>Jenkins</system>
-        <url>http://mbp:8081/jenkins/</url>
-    </ciManagement>
-    <scm>
-        <connection>scm:git:git@github.com:MehrCurry/${project.artifactId}.git</connection>
-        <developerConnection>scm:git:git@github.com:MehrCurry/${project.artifactId}.git</developerConnection>
-        <url>https://github.com/MehrCurry/${project.artifactId}</url>
-    </scm>
-    <distributionManagement>
-        <repository>
-            <id>central</id>
-            <name>local-releases</name>
-            <url>http://localhost:8081/artifactory/libs-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>local-snapshots</name>
-            <url>http://localhost:8081/artifactory/libs-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>	<properties>
+	<issueManagement>
+		<system>JIRA</system>
+		<url>http://builder:8080/jira/</url>
+	</issueManagement>
+	<ciManagement>
+		<system>Jenkins</system>
+		<url>http://mbp:8081/jenkins/</url>
+	</ciManagement>
+	<scm>
+		<connection>scm:git:git@github.com:MehrCurry/${project.artifactId}.git</connection>
+		<developerConnection>scm:git:git@github.com:MehrCurry/${project.artifactId}.git</developerConnection>
+		<url>https://github.com/MehrCurry/${project.artifactId}</url>
+	</scm>
+	<distributionManagement>
+		<repository>
+			<id>central</id>
+			<name>local-releases</name>
+			<url>http://localhost:8081/artifactory/libs-release-local</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>local-snapshots</name>
+			<url>http://localhost:8081/artifactory/libs-snapshot-local</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<camel.version>2.8.2</camel.version>
 	</properties>
@@ -63,6 +64,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-jcr</artifactId>
+			<version>${camel.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.fusesource.commonman</groupId>
 			<artifactId>commons-management</artifactId>
 			<version>1.0</version>
@@ -76,6 +83,14 @@
 	</dependencies>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-maven-plugin</artifactId>
+			<version>${camel.version}</version>
+				<configuration>
+					<applicationContextUri>META-INF/spring/*.xml</applicationContextUri>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>

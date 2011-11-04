@@ -23,7 +23,7 @@
 		<route id="jmsTofile-route" autoStartup="true">
 			<description>Test Route</description>
 			<from uri="jms://incoming" />
-			<to uri="jcr://admin:admin/repository/root" />
+			<to uri="jcr://admin:admin@repository/default" />
 		</route>
 	</camelContext>
 
@@ -49,7 +49,7 @@
 
 	<bean id="repository"
 		class="org.apache.jackrabbit.rmi.repository.URLRemoteRepository">
-		<constructor-arg value="http://localhost:8180/jackrabbit-webapp-1.5.5/rmi" />
+		<constructor-arg value="http://localhost:8180/rmi" />
 	</bean>
 
 	<bean id="jcr" class="org.apache.camel.component.jcr.JcrComponent" />

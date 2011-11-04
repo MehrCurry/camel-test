@@ -11,46 +11,82 @@
 	<packaging>bundle</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<issueManagement>
-		<system>JIRA</system>
-		<url>http://builder:8080/jira/</url>
-	</issueManagement>
-	<ciManagement>
-		<system>Jenkins</system>
-		<url>http://mbp:8081/jenkins/</url>
-	</ciManagement>
-	<scm>
-		<connection>scm:git:git@github.com:MehrCurry/${project.artifactId}.git</connection>
-		<developerConnection>scm:git:git@github.com:MehrCurry/${project.artifactId}.git</developerConnection>
-		<url>https://github.com/MehrCurry/${project.artifactId}</url>
-	</scm>
-	<distributionManagement>
-		<repository>
-			<id>central</id>
-			<name>local-releases</name>
-			<url>http://localhost:8081/artifactory/libs-release-local</url>
-		</repository>
-		<snapshotRepository>
-			<id>snapshots</id>
-			<name>local-snapshots</name>
-			<url>http://localhost:8081/artifactory/libs-snapshot-local</url>
-		</snapshotRepository>
-	</distributionManagement>
+        <system>JIRA</system>
+        <url>http://builder:8081/jira/</url>
+    </issueManagement>
+    <ciManagement>
+        <system>Jenkins</system>
+        <url>http://builder:8081/jenkins/</url>
+    </ciManagement>
+    <scm>
+        <connection>scm:git:git@github.com:MehrCurry/${project.artifactId}.git</connection>
+        <developerConnection>scm:git:git@github.com:MehrCurry/${project.artifactId}.git</developerConnection>
+        <url>https://github.com/MehrCurry/${project.artifactId}</url>
+    </scm>
+    <distributionManagement>
+        <repository>
+            <id>central</id>
+            <name>local-releases</name>
+            <url>http://builder:8081/artifactory/libs-release-local</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>local-snapshots</name>
+            <url>http://builder:8081/artifactory/libs-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<camel.version>2.8.2</camel.version>
 	</properties>
+          <repositories>
+        <repository>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <id>central</id>
+          <name>libs-release</name>
+          <url>http://zockoll.dyndns.org:8081/artifactory/libs-release</url>
+        </repository>
+        <repository>
+          <snapshots />
+          <id>snapshots</id>
+          <name>libs-snapshot</name>
+          <url>http://zockoll.dyndns.org:8081/artifactory/libs-snapshot</url>
+        </repository>
+      </repositories>
 	<dependencies>
-		<dependency>
+        <!--
+        <dependency>
 			<groupId>de.gzockoll</groupId>
 			<artifactId>pdfcategorizer</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+        -->
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-core</artifactId>
 			<version>${camel.version}</version>
 			<scope>provided</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-paxlogging</artifactId>
+            <version>${camel.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-eventadmin</artifactId>
+            <version>${camel.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jcr</artifactId>
+            <version>${camel.version}</version>
+            <scope>provided</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-http</artifactId>

@@ -8,7 +8,8 @@ import org.apache.camel.model.dataformat.BindyType;
 final class MyRouteBuilder extends RouteBuilder {
     @Override
     public void configure() {
-        errorHandler(deadLetterChannel("log:dead?level=ERROR"));
+        // errorHandler(deadLetterChannel("log:dead?level=ERROR"));
+        errorHandler(defaultErrorHandler().maximumRedeliveries(3).redeliveryDelay(3000));
         from("file:data/inbox/?fileName=data.csv&noop=true")
                 .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").unmarshal()
                 .bindy(BindyType.Csv, "de.gzockoll.prototype.camel.bindy")

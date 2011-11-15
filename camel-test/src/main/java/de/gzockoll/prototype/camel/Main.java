@@ -12,7 +12,6 @@ public class Main {
     public static void main(String[] args) throws Exception {
         CamelContext context = new DefaultCamelContext();
 
-        // AnnotationTypeConverterLoader loader=new AnnotationTypeConverterLoader(resolver)
         context.addRoutes(new MyRouteBuilder());
 
         context.setTracing(true);

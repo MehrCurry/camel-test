@@ -7,7 +7,6 @@ package de.gzockoll.prototype.camel;
 import java.io.File;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.jcr.JcrConstants;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
@@ -48,7 +47,7 @@ public class PdfProcessorTest extends CamelTestSupport {
             public void configure() throws Exception {
                 errorHandler(deadLetterChannel("log:dead?level=ERROR"));
                 from("file:src/test/resources?noop=true").process(new PdfProcessor())
-                        .setProperty(JcrConstants.JCR_NODE_NAME, constant("$SuggestedFilename"))
+                        // .setProperty(JcrConstants.JCR_NODE_NAME, constant("$SuggestedFilename"))
                         .setProperty("my.contents.property", body()).to("log:de.gzockoll.prototype.camel?level=DEBUG")
                         .to("mock:pdf");
             }

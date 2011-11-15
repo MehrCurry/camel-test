@@ -5,17 +5,19 @@ import org.apache.camel.impl.DefaultCamelContext;
 
 public class Main {
 
-	/**
-	 * @param args
-	 * @throws Exception 
-	 */
-	public static void main(String[] args) throws Exception {
-		CamelContext context = new DefaultCamelContext();
+    /**
+     * @param args
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
+        CamelContext context = new DefaultCamelContext();
 
-		context.addRoutes(new MyRouteBuilder());
-		context.setTracing(true);
-		context.start();
-		Thread.sleep(10000);
-		context.stop();
-	}
+        // AnnotationTypeConverterLoader loader=new AnnotationTypeConverterLoader(resolver)
+        context.addRoutes(new MyRouteBuilder());
+
+        context.setTracing(true);
+        context.start();
+        Thread.sleep(2000);
+        context.stop();
+    }
 }

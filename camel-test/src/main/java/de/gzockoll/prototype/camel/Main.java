@@ -12,6 +12,8 @@ import javax.swing.JMenuItem;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.processor.interceptor.DefaultTraceFormatter;
+import org.apache.camel.processor.interceptor.Tracer;
 
 @SuppressWarnings("javadoc")
 public class Main {
@@ -46,6 +48,20 @@ public class Main {
 
         context.addRoutes(new MyRouteBuilder());
 
+        Tracer tracer = new Tracer();
+        tracer.setTraceOutExchanges(true);
+
+        // we configure the default trace formatter where we can
+        // specify which fields we want in the output
+        DefaultTraceFormatter formatter = new DefaultTraceFormatter();
+        formatter.setShowOutBody(true);
+        formatter.setShowOutBodyType(true);
+        formatter.setShowHeaders(true);
+
+        // set to use our formatter
+        tracer.setFormatter(formatter);
+
+        context.addInterceptStrategy(tracer);
         context.setTracing(true);
         context.start();
         showFrame();

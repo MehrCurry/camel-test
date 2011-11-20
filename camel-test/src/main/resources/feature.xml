@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<features>
-<feature name="${artifactId}" version="${version}">
-    <bundle>mvn:org.apache.pdfbox/pdfbox/1.6/jar/osgi</bundle>
-    <bundle>mvn:org.apache.fontbox/pdfbox/1.6/jar/osgi</bundle>
-    <bundle>mvn:org.apache.jempbox/pdfbox/1.6/jar/osgi</bundle>
-</feature>
-</features>

@@ -96,6 +96,12 @@
 			<artifactId>camel-jcr</artifactId>
 			<version>${camel.version}</version>
 			<scope>provided</scope>
+			<exclusions>
+			    <exclusion>
+			        <artifactId>slf4j-log4j12</artifactId>
+			        <groupId>org.slf4j</groupId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
@@ -139,12 +145,6 @@
 			<version>1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.6.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>1.0.0</version>
@@ -154,6 +154,12 @@
 			<artifactId>pdfcategorizer</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>provided</scope>
+			<exclusions>
+			    <exclusion>
+			        <artifactId>sli4j-slf4j-jdk14</artifactId>
+			        <groupId>com.googlecode.sli4j</groupId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 	<build>

@@ -1,6 +1,7 @@
-package de.gzockoll.prototype.camel.encashment;
+package de.gzockoll.prototype.camel.encashment.entity;
 
 import javax.persistence.Entity;
+
 
 @Entity
 public class Merchant extends NamedEntity {

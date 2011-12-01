@@ -1,4 +1,4 @@
-package de.gzockoll.prototype.camel.encashment;
+package de.gzockoll.prototype.camel.encashment.entity;
 
 import javax.persistence.MappedSuperclass;
 

@@ -1,4 +1,5 @@
-package de.gzockoll.prototype.camel.encashment;
+package de.gzockoll.prototype.camel.encashment.entity;
+
 
 public class Customer extends NamedEntity {
 

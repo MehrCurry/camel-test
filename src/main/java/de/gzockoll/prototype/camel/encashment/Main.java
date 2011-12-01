@@ -20,6 +20,8 @@ import org.apache.camel.Producer;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.processor.interceptor.DefaultTraceFormatter;
 import org.apache.camel.processor.interceptor.Tracer;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @SuppressWarnings("javadoc")
 public class Main {
@@ -49,6 +51,9 @@ public class Main {
 	private CamelContext context;
 
 	public void run() throws Exception {
+		ApplicationContext springContext = new ClassPathXmlApplicationContext(
+				new String[] { "/data-beans.xml", "/control-beans.xml",
+						"/camel-beans.xml" });
 		context = new DefaultCamelContext();
 		context.getManagementStrategy().getManagementAgent()
 				.setCreateConnector(true);

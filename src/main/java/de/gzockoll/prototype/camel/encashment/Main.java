@@ -24,6 +24,7 @@ import org.apache.commons.lang.Validate;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.gzockoll.prototype.camel.encashment.entity.EncashmentType;
 import de.gzockoll.prototype.camel.encashment.service.EncashmentService;
 
 @SuppressWarnings("javadoc")

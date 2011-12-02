@@ -70,7 +70,7 @@ public class EncashmentService {
 		logger.debug("Processing started!");
 		Validate.notNull(em);
 		Query query = em
-				.createQuery("SELECT e FROM EncashmentEntry e WHERE e.status != 'DELIVERED'");
+				.createQuery("SELECT e FROM EncashmentEntry e WHERE e.status = 'NEW' OR e.status = 'ERROR' ");
 		Collection<EncashmentEntry> entries = query.getResultList();
 		for (EncashmentEntry e : entries) {
 			if (e.getStatus() != EncashmentStatus.DELIVERED)

@@ -15,7 +15,7 @@ public final class MyRouteBuilder extends RouteBuilder {
 				.retryAttemptedLogLevel(LoggingLevel.WARN).redeliveryDelay(250)
 				.backOffMultiplier(2));
 
-		from("quartz://myGroup/myTimerName/*/*/*/*/*/$").bean(
+		from("quartz://myGroup/myTimerName?cron=0+*+*+*+*+?").bean(
 				EncashmentService.class, "startProcessing()");
 
 		from("direct:input").to("seda:inkasso1");
@@ -61,6 +61,7 @@ public final class MyRouteBuilder extends RouteBuilder {
 						Exchange.FILE_NAME,
 						simple("${file:name.noext}-${header:breadcrumbId}-${date:now:yyyyMMddHHmmssSSS}.xml"))
 				.to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
-				.to("file:data/error");
+				.to("file:data/error")
+				.bean(EncashmentService.class, "onError()");
 	}
 }

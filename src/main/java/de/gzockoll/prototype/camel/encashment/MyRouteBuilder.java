@@ -3,7 +3,6 @@ package de.gzockoll.prototype.camel.encashment;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.model.dataformat.BindyType;
 
 import de.gzockoll.prototype.camel.encashment.service.EncashmentService;
 
@@ -24,20 +23,18 @@ public final class MyRouteBuilder extends RouteBuilder {
                 .when(property("TYPE").isEqualTo(EncashmentType.PAYMENT.name())).to("seda:inkasso1_payment")
                 .otherwise().to("seda:error").end();
 
-        from("seda:inkasso1_order").marshal().bindy(BindyType.Csv, "de.gzockoll.prototype.camel.encashment.entity")
-                .to("ftp://ftpuser@fritz.box/out?password=tux88.");
+        from("seda:inkasso1_order").marshal().json().to("ftp://ftpuser@zockoll.dyndns.org/out?password=tux88.");
 
-        from("seda:inkasso1_credit").marshal().bindy(BindyType.Csv, "de.gzockoll.prototype.camel.encashment.entity")
-                .setHeader("subject", constant("Credit received")).setHeader("to", constant("gzockoll@gmail.com"))
-                .to("seda:gmail");
+        from("seda:inkasso1_credit").marshal().json().setHeader("subject", constant("Credit received"))
+                .setHeader("to", constant("gzockoll@gmail.com")).to("seda:gmail");
 
-        from("seda:inkasso1_payment").marshal().bindy(BindyType.Csv, "de.gzockoll.prototype.camel.encashment.entity")
-                .setHeader("subject", constant("PAYMENT made")).setHeader("to", constant("gzockoll@gmail.com"))
-                .to("seda:gmail");
+        from("seda:inkasso1_payment").marshal().json().setHeader("subject", constant("PAYMENT made"))
+                .setHeader("to", constant("gzockoll@gmail.com")).to("seda:gmail");
 
         from("seda:gmail").to("smtps://gztest999@smtp.gmail.com?password=fifi9999");
 
-        from("seda:filemanager").to("file:data/outbox");
+        from("seda:filemanager").marshal().xstream("UTF-8")
+                .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").to("file:data/outbox");
 
         from("seda:error")
                 .marshal()

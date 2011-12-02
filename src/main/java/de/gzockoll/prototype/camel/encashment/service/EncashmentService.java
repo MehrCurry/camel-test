@@ -84,7 +84,7 @@ public class EncashmentService {
             // a
             // file and a Hello World text/plain message.
             Exchange exchange = endpoint.createExchange();
-            exchange.setProperty("TYPE", EncashmentType.CREDIT.name());
+            exchange.setProperty("TYPE", EncashmentType.ORDER.name());
             exchange.setProperty("encashmentId", e.getId());
             Message in = exchange.getIn();
             in.setBody(e);

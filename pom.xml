@@ -81,6 +81,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-quartz</artifactId>
+			<version>${camel.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-ftp</artifactId>
 			<version>${camel.version}</version>
 			<scope>provided</scope>
@@ -231,6 +237,39 @@
 					<groupId>com.googlecode.sli4j</groupId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+				<dependency>
+			<groupId>de.huxhorn.lilith</groupId>
+			<artifactId>
+            de.huxhorn.lilith.logback.appender.multiplex-classic
+        </artifactId>
+			<version>0.9.41</version>
+		</dependency>
+		<dependency>
+			<groupId>de.huxhorn.sulky</groupId>
+			<artifactId>de.huxhorn.sulky.codec</artifactId>
+			<version>0.9.13</version>
+		</dependency>
+		<dependency>
+			<groupId>de.huxhorn.lilith</groupId>
+			<artifactId>de.huxhorn.lilith.data.logging.protobuf</artifactId>
+			<version>0.9.41</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>2.4.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib</artifactId>
+			<version>2.2.2</version>
 		</dependency>
 	</dependencies>
 	<build>

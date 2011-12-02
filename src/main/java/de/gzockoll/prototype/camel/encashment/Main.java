@@ -20,8 +20,11 @@ import org.apache.camel.Producer;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.processor.interceptor.DefaultTraceFormatter;
 import org.apache.camel.processor.interceptor.Tracer;
+import org.apache.commons.lang.Validate;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import de.gzockoll.prototype.camel.encashment.service.EncashmentService;
 
 @SuppressWarnings("javadoc")
 public class Main {
@@ -49,11 +52,14 @@ public class Main {
 	}
 
 	private CamelContext context;
+	private ApplicationContext springContext;
 
 	public void run() throws Exception {
-		ApplicationContext springContext = new ClassPathXmlApplicationContext(
-				new String[] { "/data-beans.xml", "/control-beans.xml",
-						"/camel-beans.xml" });
+		springContext = new ClassPathXmlApplicationContext(new String[] {
+				"/data-beans.xml", "/control-beans.xml", "/camel-beans.xml" });
+
+		startEncashment();
+
 		context = new DefaultCamelContext();
 		context.getManagementStrategy().getManagementAgent()
 				.setCreateConnector(true);
@@ -78,6 +84,19 @@ public class Main {
 		context.start();
 		showFrame();
 
+		// sendTestMessage();
+
+	}
+
+	private void startEncashment() {
+		EncashmentService service = springContext
+				.getBean(EncashmentService.class);
+		Validate.notNull(service);
+		service.populateDatabase();
+
+	}
+
+	private void sendTestMessage() throws Exception {
 		// create an exchange with a normal body and attachment to be produced
 		// as email
 		Endpoint endpoint = context.getEndpoint("direct:input");
@@ -97,7 +116,6 @@ public class Main {
 		producer.start();
 		// and let it go (processes the exchange by sending the email)
 		producer.process(exchange);
-
 	}
 
 	/**

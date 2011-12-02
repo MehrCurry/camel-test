@@ -3,7 +3,7 @@ package de.gzockoll.prototype.camel.encashment.entity;
 import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public abstract class NamedEntity {
+public abstract class NamedEntity extends AbstractEntity {
 	protected String name;
 
 	public NamedEntity(String name) {

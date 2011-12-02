@@ -4,6 +4,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 
+import de.gzockoll.prototype.camel.encashment.service.EncashmentService;
+
 @SuppressWarnings("javadoc")
 final class MyRouteBuilder extends RouteBuilder {
 	@Override
@@ -11,6 +13,9 @@ final class MyRouteBuilder extends RouteBuilder {
 		errorHandler(deadLetterChannel("seda:error").maximumRedeliveries(5)
 				.retryAttemptedLogLevel(LoggingLevel.WARN).redeliveryDelay(250)
 				.backOffMultiplier(2));
+
+		from("quartz://myGroup/myTimerName/*/*/*/*/*/$").bean(
+				EncashmentService.class, "startProcessing()");
 
 		from("direct:input").to("seda:inkasso1");
 

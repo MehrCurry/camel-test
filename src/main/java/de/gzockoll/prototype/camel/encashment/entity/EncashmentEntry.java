@@ -6,24 +6,32 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.OneToOne;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
+import org.apache.camel.dataformat.bindy.annotation.DataField;
 import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Type;
 import org.joda.money.Money;
 
 @SuppressWarnings("javadoc")
 @Entity
+@CsvRecord(separator = ",", generateHeaderColumns = true)
 public class EncashmentEntry extends AbstractEntity {
     @OneToOne
+    @DataField(pos = 1)
     private Merchant merchant;
     @OneToOne
+    @DataField(pos = 2)
     private Customer customer;
+    @DataField(pos = 3)
     private String text;
     @Type(type = "de.gzockoll.prototype.camel.encashment.types.MoneyType")
     @Columns(columns = { @Column(name = "amount"), @Column(name = "currency") })
+    @DataField(pos = 4)
     private Money money;
     @Enumerated(EnumType.STRING)
+    @DataField(pos = 5)
     private EncashmentStatus status = EncashmentStatus.NEW;
+    @DataField(pos = 6)
     private int tries = 0;
 
     public EncashmentEntry() {
@@ -73,10 +81,5 @@ public class EncashmentEntry extends AbstractEntity {
 
     public void successfulDelivered() {
         status = EncashmentStatus.DELIVERED;
-    }
-
-    @Override
-    public String toString() {
-        return new ReflectionToStringBuilder(this).toString();
     }
 }

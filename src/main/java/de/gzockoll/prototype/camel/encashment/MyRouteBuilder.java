@@ -12,8 +12,12 @@ public final class MyRouteBuilder extends RouteBuilder {
 	@Override
 	public void configure() {
 		errorHandler(deadLetterChannel("seda:error").maximumRedeliveries(5)
-				.retryAttemptedLogLevel(LoggingLevel.WARN).redeliveryDelay(250)
-				.backOffMultiplier(2));
+				.retryAttemptedLogLevel(LoggingLevel.WARN)
+				.redeliveryDelay(10000).backOffMultiplier(2));
+
+		from("quartz://myGroup/restCall?cron=0+*/5+*+*+*+?").setHeader(
+				Exchange.HTTP_METHOD, constant("GET")).to(
+				"http://timecard.gzockoll.de/entry/show/612");
 
 		from("quartz://myGroup/myTimerName?cron=0+*+*+*+*+?").bean(
 				EncashmentService.class, "startProcessing()");
@@ -22,7 +26,7 @@ public final class MyRouteBuilder extends RouteBuilder {
 
 		from("seda:inkasso1")
 				.multicast()
-				.to("seda:filemanager")
+				.to("activemq:queue:filemanager")
 				.choice()
 				.when(property("TYPE").isEqualTo(EncashmentType.ORDER.name()))
 				.to("seda:inkasso1_order")
@@ -38,7 +42,7 @@ public final class MyRouteBuilder extends RouteBuilder {
 		from("seda:inkasso1_credit").marshal().json()
 				.setHeader("subject", constant("Credit received"))
 				.setHeader("to", constant("gzockoll@gmail.com"))
-				.to("seda:gmail");
+				.to("seda:gmail-wrong");
 
 		from("seda:inkasso1_payment").marshal().json()
 				.setHeader("subject", constant("PAYMENT made"))
@@ -48,7 +52,10 @@ public final class MyRouteBuilder extends RouteBuilder {
 		from("seda:gmail").to(
 				"smtps://gztest999@smtp.gmail.com?password=fifi9999");
 
-		from("seda:filemanager")
+		from("seda:gmail-wrong").to(
+				"smtps://wrong@smtp.gmail.com?password=wrong");
+
+		from("activemq:queue:filemanager")
 				.marshal()
 				.xstream("UTF-8")
 				.to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")

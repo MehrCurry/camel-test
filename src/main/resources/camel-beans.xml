@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-    xmlns:osgi="http://camel.apache.org/schema/osgi" xmlns:camel="http://camel.apache.org/schema/spring"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:osgi="http://camel.apache.org/schema/osgi" xmlns:camel="http://camel.apache.org/schema/spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
 		http://camel.apache.org/schema/osgi http://camel.apache.org/schema/osgi/camel-osgi-2.0-M1.xsd
 		http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring-2.0-M1.xsd">
 
-    <bean id="camelTracer" class="org.apache.camel.processor.interceptor.Tracer">
-        <property name="traceExceptions" value="true" />
-        <property name="traceInterceptors" value="true" />
-        <property name="logLevel" value="ERROR" />
-        <property name="logName" value="de.gzockoll.prototype.camel.trace" />
-    </bean>
+	<bean id="camelTracer" class="org.apache.camel.processor.interceptor.Tracer">
+		<property name="traceExceptions" value="true" />
+		<property name="traceInterceptors" value="true" />
+		<property name="logLevel" value="ERROR" />
+		<property name="logName" value="de.gzockoll.prototype.camel.trace" />
+	</bean>
 
-    <camel:camelContext trace="true" id="encashmentContext"
-        xmlns="http://camel.apache.org/schema/spring">
-        <routeBuilder ref="myBuilder" />
-    </camel:camelContext>
+	<camel:camelContext trace="true" id="encashmentContext"
+		xmlns="http://camel.apache.org/schema/spring">
+		<routeBuilder ref="myBuilder" />
+	</camel:camelContext>
 
-    <bean id="myBuilder"
-        class="de.gzockoll.prototype.camel.encashment.MyRouteBuilder" />
+	<bean id="myBuilder" class="de.gzockoll.prototype.camel.encashment.MyRouteBuilder" />
+
+	<bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+		<property name="brokerURL" value="tcp://localhost:61616" />
+	</bean>
 </beans>

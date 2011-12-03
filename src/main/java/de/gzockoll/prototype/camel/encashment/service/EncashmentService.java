@@ -5,6 +5,7 @@ import static org.joda.money.CurrencyUnit.EUR;
 import java.util.Collection;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -19,9 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.gzockoll.prototype.camel.encashment.entity.AbstractEntity;
 import de.gzockoll.prototype.camel.encashment.entity.Customer;
 import de.gzockoll.prototype.camel.encashment.entity.EncashmentEntry;
 import de.gzockoll.prototype.camel.encashment.entity.EncashmentStatus;
@@ -30,7 +31,7 @@ import de.gzockoll.prototype.camel.encashment.entity.Merchant;
 
 @SuppressWarnings("javadoc")
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED)
 public class EncashmentService {
 	Logger logger = LoggerFactory.getLogger(EncashmentService.class);
 	@PersistenceContext
@@ -38,17 +39,28 @@ public class EncashmentService {
 	@Autowired
 	private CamelContext context;
 
-	public AbstractEntity processEncashmentOrder(Merchant m, Customer c,
+	public EncashmentEntry processEncashmentOrder(Merchant m, Customer c,
 			String text, Money amount) {
-		AbstractEntity entry = new EncashmentEntry(m, c, text, amount);
-		em.persist(em);
+		EncashmentEntry entry = new EncashmentEntry(em.merge(m), em.merge(c),
+				text, amount, EncashmentType.ORDER);
+		em.persist(entry);
 		return entry;
 	}
 
-	public void processCredit(Merchant m, Customer c, String text, Money amount) {
+	public EncashmentEntry processCredit(Merchant m, Customer c, String text,
+			Money amount) {
+		EncashmentEntry entry = new EncashmentEntry(em.merge(m), em.merge(c),
+				text, amount, EncashmentType.CREDIT);
+		em.persist(entry);
+		return entry;
 	}
 
-	public void processPayment(Merchant m, Customer c, String text, Money amount) {
+	public EncashmentEntry processPayment(Merchant m, Customer c, String text,
+			Money amount) {
+		EncashmentEntry entry = new EncashmentEntry(em.merge(m), em.merge(c),
+				text, amount, EncashmentType.PAYMENT);
+		em.persist(entry);
+		return entry;
 
 	}
 
@@ -78,7 +90,7 @@ public class EncashmentService {
 		}
 	}
 
-	private void deliver(AbstractEntity e) {
+	private void deliver(EncashmentEntry e) {
 		try {
 			// create an exchange with a normal body and attachment to be
 			// produced
@@ -89,7 +101,7 @@ public class EncashmentService {
 			// a
 			// file and a Hello World text/plain message.
 			Exchange exchange = endpoint.createExchange();
-			exchange.setProperty("TYPE", EncashmentType.ORDER.name());
+			exchange.setProperty("TYPE", e.getType().name());
 			exchange.setProperty("encashmentId", e.getId());
 			Message in = exchange.getIn();
 			in.setBody(e);
@@ -100,8 +112,11 @@ public class EncashmentService {
 			producer.start();
 			// and let it go (processes the exchange by sending the email)
 			producer.process(exchange);
+			e.setStatus(EncashmentStatus.PROCESSING);
+			em.persist(e);
 		} catch (Exception ex) {
 			logger.error("Delivery failed:", e);
+			e.deliveryError();
 		}
 	}
 
@@ -114,12 +129,34 @@ public class EncashmentService {
 	}
 
 	public void populateDatabase() {
-		Merchant m = new Merchant("Zalando");
-		em.persist(m);
-		Customer c = new Customer("Vera Müller");
-		em.persist(c);
-		AbstractEntity entry = new EncashmentEntry(m, c, "Schuhe",
-				Money.ofMajor(EUR, 10));
-		em.persist(entry);
+		Merchant m = getMerchant("Zalando");
+		Customer c = getCustomer("Vera Müller");
+		processEncashmentOrder(m, c, "Schuhe", Money.ofMajor(EUR, 10));
+		processCredit(m, c, "Schuhe", Money.ofMajor(EUR, 10));
+		processPayment(m, c, "Schuhe", Money.ofMajor(EUR, 10));
+	}
+
+	private Customer getCustomer(String name) {
+		Query query = em.createNamedQuery(Customer.FIND_BY_NAME);
+		Customer c;
+		try {
+			c = (Customer) query.setParameter("name", name).getSingleResult();
+		} catch (NoResultException e) {
+			c = new Customer(name);
+			em.persist(c);
+		}
+		return c;
+	}
+
+	private Merchant getMerchant(String name) {
+		Query query = em.createNamedQuery(Merchant.FIND_BY_NAME);
+		Merchant m;
+		try {
+			m = (Merchant) query.setParameter("name", name).getSingleResult();
+		} catch (NoResultException e) {
+			m = new Merchant(name);
+			em.persist(m);
+		}
+		return m;
 	}
 }

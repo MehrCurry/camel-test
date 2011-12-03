@@ -13,7 +13,7 @@
         <ReconnectionDelay>10000</ReconnectionDelay>
         <IncludeCallerData>true</IncludeCallerData>
         <RemoteHosts>localhost</RemoteHosts>
-        <ApplicationIdentifier>transactions
+        <ApplicationIdentifier>encashment
         </ApplicationIdentifier>
         <encoding>UTF-8</encoding>
     </appender>

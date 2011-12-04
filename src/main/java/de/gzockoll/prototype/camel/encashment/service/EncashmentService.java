@@ -65,6 +65,7 @@ public class EncashmentService {
 	}
 
 	public void onError(byte[] body, Exchange exchange) {
+		logger.warn("Error delivering: " + exchange);
 		EncashmentEntry entry = em.find(EncashmentEntry.class,
 				exchange.getProperty("encashmentId"));
 		entry.deliveryError();
@@ -72,6 +73,7 @@ public class EncashmentService {
 	}
 
 	public void onSuccess(byte[] body, Exchange exchange) {
+		logger.debug("Successful delivered: " + exchange);
 		EncashmentEntry entry = em.find(EncashmentEntry.class,
 				exchange.getProperty("encashmentId"));
 		entry.successfulDelivered();

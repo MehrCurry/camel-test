@@ -11,15 +11,15 @@ import de.gzockoll.prototype.camel.encashment.service.EncashmentService;
 public final class MyRouteBuilder extends RouteBuilder {
 	@Override
 	public void configure() {
-		errorHandler(deadLetterChannel("seda:error").maximumRedeliveries(5)
-				.retryAttemptedLogLevel(LoggingLevel.WARN)
-				.redeliveryDelay(10000).backOffMultiplier(2));
+		errorHandler(deadLetterChannel("seda:error").maximumRedeliveries(3)
+				.retryAttemptedLogLevel(LoggingLevel.WARN).useOriginalMessage()
+				.redeliveryDelay(5000).backOffMultiplier(2));
 
-		from("quartz://myGroup/restCall?cron=0+*/5+*+*+*+?").setHeader(
-				Exchange.HTTP_METHOD, constant("GET")).to(
-				"http://timecard.gzockoll.de/entry/show/612");
+		// from("quartz://myGroup/restCall?cron=0+*/5+*+*+*+?").setHeader(
+		// Exchange.HTTP_METHOD, constant("GET")).to(
+		// "http://timecard.gzockoll.de/entry/show/612");
 
-		from("quartz://myGroup/myTimerName?cron=0+*+*+*+*+?").bean(
+		from("quartz://myGroup/myTimerName?cron=*/30+*+*+*+*+?").bean(
 				EncashmentService.class, "startProcessing()");
 
 		from("direct:input").to("seda:inkasso1");
@@ -37,7 +37,7 @@ public final class MyRouteBuilder extends RouteBuilder {
 
 		from("seda:inkasso1_order").marshal().json()
 				.to("ftp://ftpuser@zockoll.dyndns.org/out?password=tux88.")
-				.bean(EncashmentService.class, "onSuccess()");
+				.to("seda:success");
 
 		from("seda:inkasso1_credit").marshal().json()
 				.setHeader("subject", constant("Credit received"))
@@ -50,16 +50,20 @@ public final class MyRouteBuilder extends RouteBuilder {
 				.to("seda:gmail");
 
 		from("seda:gmail").to(
-				"smtps://gztest999@smtp.gmail.com?password=fifi9999");
+				"smtps://gztest999@smtp.gmail.com?password=fifi9999").to(
+				"seda:success");
 
 		from("seda:gmail-wrong").to(
-				"smtps://wrong@smtp.gmail.com?password=wrong");
+				"smtps://wrong@smtp.gmail.com?password=wrong").to(
+				"seda:success");
 
 		from("activemq:queue:filemanager")
 				.marshal()
 				.xstream("UTF-8")
 				.to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
 				.to("file:data/outbox");
+
+		from("seda:success").bean(EncashmentService.class, "onSuccess()");
 
 		from("seda:error")
 				.marshal()

@@ -4,31 +4,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.logging.Level;
 
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
+import javax.annotation.PostConstruct;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.Endpoint;
-import org.apache.camel.Exchange;
-import org.apache.camel.Message;
-import org.apache.camel.Producer;
-import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.processor.interceptor.DefaultTraceFormatter;
-import org.apache.camel.processor.interceptor.Tracer;
 import org.apache.commons.lang.Validate;
-import org.springframework.context.ApplicationContext;
+import org.jdesktop.swingx.JXErrorPane;
+import org.jdesktop.swingx.error.ErrorInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
 
-import de.gzockoll.prototype.camel.encashment.entity.EncashmentType;
 import de.gzockoll.prototype.camel.encashment.service.EncashmentService;
 
 @SuppressWarnings("javadoc")
-public class Main {
+@Component
+public class Main implements MessageHandler {
 
 	private class WindowEventHandler extends WindowAdapter {
 		private final CamelContext context;
@@ -44,107 +41,50 @@ public class Main {
 		}
 	}
 
+	private static ClassPathXmlApplicationContext springContext;
+
 	/**
 	 * @param args
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		new Main().run();
-	}
 
-	private CamelContext context;
-	private ApplicationContext springContext;
-
-	public void run() throws Exception {
 		springContext = new ClassPathXmlApplicationContext(new String[] {
 				"/amq-beans.xml", "/data-beans.xml", "/control-beans.xml",
 				"/camel-beans.xml" });
-
-		startEncashment();
-
-		// createCamelContext();
-		showFrame();
-
-		// sendTestMessage();
-
 	}
 
-	/**
-	 * @throws Exception
-	 */
-	private void createCamelContext() throws Exception {
-		context = new DefaultCamelContext();
-		context.getManagementStrategy().getManagementAgent()
-				.setCreateConnector(true);
+	private CamelContext context;
+	private JFrame frame;
+	@Autowired
+	private EncashmentService service;
 
-		context.addRoutes(new MyRouteBuilder());
+	@PostConstruct
+	public void run() throws Exception {
 
-		Tracer tracer = new Tracer();
-		tracer.setTraceOutExchanges(true);
+		startEncashment();
+		showFrame();
 
-		// we configure the default trace formatter where we can
-		// specify which fields we want in the output
-		DefaultTraceFormatter formatter = new DefaultTraceFormatter();
-		formatter.setShowOutBody(true);
-		formatter.setShowOutBodyType(true);
-		formatter.setShowHeaders(true);
-
-		// set to use our formatter
-		tracer.setFormatter(formatter);
-
-		context.addInterceptStrategy(tracer);
-		context.setTracing(true);
-		context.start();
 	}
 
 	private void startEncashment() {
-		EncashmentService service = springContext
-				.getBean(EncashmentService.class);
 		Validate.notNull(service);
 		service.populateDatabase();
-
-	}
-
-	private void sendTestMessage() throws Exception {
-		// create an exchange with a normal body and attachment to be produced
-		// as email
-		Endpoint endpoint = context.getEndpoint("direct:input");
-
-		// create the exchange with the mail message that is multipart with a
-		// file and a Hello World text/plain message.
-		Exchange exchange = endpoint.createExchange();
-		exchange.setProperty("TYPE", EncashmentType.CREDIT.name());
-		Message in = exchange.getIn();
-		in.setBody("Hello World");
-		in.addAttachment("data.csv", new DataHandler(new FileDataSource(
-				"data/inbox/data.csv")));
-
-		// create a producer that can produce the exchange (= send the mail)
-		Producer producer = endpoint.createProducer();
-		// start the producer
-		producer.start();
-		// and let it go (processes the exchange by sending the email)
-		producer.process(exchange);
 	}
 
 	/**
      *
      */
 	private void onExit() {
-		try {
-			context.stop();
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		} finally {
-			System.exit(0);
-		}
+		springContext.close();
+		System.exit(0);
 	}
 
 	/**
      *
      */
 	private void showFrame() {
-		JFrame frame = new JFrame();
+		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.addWindowListener(new WindowEventHandler(context));
 
@@ -169,5 +109,23 @@ public class Main {
 		frame.setSize(200, 200);
 		frame.pack();
 		frame.setVisible(true);
+	}
+
+	@Override
+	public void showMessage(String message) {
+		JOptionPane.showMessageDialog(frame, message);
+
+	}
+
+	@Override
+	public void showWarning(String message, Throwable t) {
+		JXErrorPane.showDialog(null, new ErrorInfo("Warning",
+				"Something happend", message, null, t, Level.WARNING, null));
+	}
+
+	@Override
+	public void showError(String message, Throwable t) {
+		JXErrorPane.showDialog(null, new ErrorInfo("Error", "Error delivering",
+				message, null, t, Level.SEVERE, null));
 	}
 }

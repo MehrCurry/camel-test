@@ -9,6 +9,10 @@ import de.gzockoll.prototype.camel.encashment.service.EncashmentService;
 
 @SuppressWarnings("javadoc")
 public final class MyRouteBuilder extends RouteBuilder {
+	private static final String TRANSPORT = "seda";
+
+	// private static final String TRANSPORT = "activemq:quene";
+
 	@Override
 	public void configure() {
 		errorHandler(deadLetterChannel("seda:error").maximumRedeliveries(3)
@@ -22,11 +26,11 @@ public final class MyRouteBuilder extends RouteBuilder {
 		from("quartz://myGroup/myTimerName?cron=*/30+*+*+*+*+?").bean(
 				EncashmentService.class, "startProcessing()");
 
-		from("direct:input").to("seda:inkasso1");
+		from("direct:input").to(TRANSPORT + ":inkasso1");
 
-		from("seda:inkasso1")
+		from(TRANSPORT + ":inkasso1")
 				.multicast()
-				.to("activemq:queue:filemanager")
+				.to("seda:filemanager")
 				.choice()
 				.when(property("TYPE").isEqualTo(EncashmentType.ORDER.name()))
 				.to("seda:inkasso1_order")
@@ -57,7 +61,7 @@ public final class MyRouteBuilder extends RouteBuilder {
 				"smtps://wrong@smtp.gmail.com?password=wrong").to(
 				"seda:success");
 
-		from("activemq:queue:filemanager")
+		from("seda:filemanager")
 				.marshal()
 				.xstream("UTF-8")
 				.to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
@@ -67,7 +71,7 @@ public final class MyRouteBuilder extends RouteBuilder {
 
 		from("seda:error")
 				.marshal()
-				.xstream("UTF-8")
+				.json()
 				.setHeader(
 						Exchange.FILE_NAME,
 						simple("${file:name.noext}-${header:breadcrumbId}-${date:now:yyyyMMddHHmmssSSS}.xml"))

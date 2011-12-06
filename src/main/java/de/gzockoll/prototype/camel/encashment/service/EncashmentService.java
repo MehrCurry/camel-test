@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import de.gzockoll.prototype.camel.encashment.MessageHandler;
 import de.gzockoll.prototype.camel.encashment.entity.Customer;
 import de.gzockoll.prototype.camel.encashment.entity.EncashmentEntry;
 import de.gzockoll.prototype.camel.encashment.entity.EncashmentStatus;
@@ -38,6 +39,13 @@ public class EncashmentService {
 	private EntityManager em;
 	@Autowired
 	private CamelContext context;
+
+	@Autowired
+	private MessageHandler msgHandler;
+
+	public void setMsgHandler(MessageHandler msgHandler) {
+		this.msgHandler = msgHandler;
+	}
 
 	public EncashmentEntry processEncashmentOrder(Merchant m, Customer c,
 			String text, Money amount) {
@@ -65,7 +73,10 @@ public class EncashmentService {
 	}
 
 	public void onError(byte[] body, Exchange exchange) {
-		logger.warn("Error delivering: " + exchange);
+		String message = "Error delivering: " + exchange;
+		logger.warn(message);
+		if (msgHandler != null)
+			msgHandler.showError(message, exchange.getException());
 		EncashmentEntry entry = em.find(EncashmentEntry.class,
 				exchange.getProperty("encashmentId"));
 		entry.deliveryError();

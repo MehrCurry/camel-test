@@ -8,12 +8,19 @@
 		http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring-2.0-M1.xsd">
 
 	<bean id="camelTracer" class="org.apache.camel.processor.interceptor.Tracer">
+		<property name="formatter" ref="traceFormatter"/>
 		<property name="traceExceptions" value="true" />
 		<property name="traceInterceptors" value="true" />
-		<property name="logLevel" value="ERROR" />
+		<property name="logLevel" value="DEBUG" />
 		<property name="logName" value="de.gzockoll.prototype.camel.trace" />
 	</bean>
 
+	<bean id="traceFormatter" class="org.apache.camel.processor.interceptor.DefaultTraceFormatter">
+		<property name="showBody" value="true"/>
+		<property name="breadCrumbLength" value="10"/>
+		<property name="showProperties" value="true"/>
+	</bean>
+	
 	<camel:camelContext trace="true" id="encashmentContext"
 		xmlns="http://camel.apache.org/schema/spring">
 		<routeBuilder ref="myBuilder" />

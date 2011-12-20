@@ -27,105 +27,103 @@ import de.gzockoll.prototype.camel.encashment.service.EncashmentService;
 @Component
 public class Main implements MessageHandler {
 
-	private class WindowEventHandler extends WindowAdapter {
-		private final CamelContext context;
+    private class WindowEventHandler extends WindowAdapter {
+        private final CamelContext context;
 
-		public WindowEventHandler(CamelContext context) {
-			this.context = context;
-		}
+        public WindowEventHandler(CamelContext context) {
+            this.context = context;
+        }
 
-		@Override
-		public void windowClosing(WindowEvent e) {
-			super.windowClosing(e);
-			onExit();
-		}
-	}
+        @Override
+        public void windowClosing(WindowEvent e) {
+            super.windowClosing(e);
+            onExit();
+        }
+    }
 
-	private static ClassPathXmlApplicationContext springContext;
+    private static ClassPathXmlApplicationContext springContext;
 
-	/**
-	 * @param args
-	 * @throws Exception
-	 */
-	public static void main(String[] args) throws Exception {
+    /**
+     * @param args
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
 
-		springContext = new ClassPathXmlApplicationContext(new String[] {
-				"/amq-beans.xml", "/data-beans.xml", "/control-beans.xml",
-				"/camel-beans.xml" });
-	}
+        springContext = new ClassPathXmlApplicationContext(new String[] { "/amq-beans.xml", "/data-beans.xml",
+                "/control-beans.xml", "/camel-beans.xml" });
+    }
 
-	private CamelContext context;
-	private JFrame frame;
-	@Autowired
-	private EncashmentService service;
+    private CamelContext context;
+    private JFrame frame;
+    @Autowired
+    private EncashmentService service;
 
-	@PostConstruct
-	public void run() throws Exception {
+    @PostConstruct
+    public void run() throws Exception {
 
-		startEncashment();
-		showFrame();
+        startEncashment();
+        showFrame();
 
-	}
+    }
 
-	private void startEncashment() {
-		Validate.notNull(service);
-		service.populateDatabase();
-	}
+    private void startEncashment() {
+        Validate.notNull(service);
+        service.populateDatabase();
+    }
 
-	/**
+    /**
      *
      */
-	private void onExit() {
-		springContext.close();
-		System.exit(0);
-	}
+    private void onExit() {
+        springContext.close();
+        System.exit(0);
+    }
 
-	/**
+    /**
      *
      */
-	private void showFrame() {
-		frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.addWindowListener(new WindowEventHandler(context));
+    private void showFrame() {
+        frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.addWindowListener(new WindowEventHandler(context));
 
-		JMenu file = new JMenu("File");
-		file.setMnemonic('F');
-		JMenuItem exitItem = new JMenuItem("Exit");
-		exitItem.setMnemonic('x');
-		file.add(exitItem);
+        JMenu file = new JMenu("File");
+        file.setMnemonic('F');
+        JMenuItem exitItem = new JMenuItem("Exit");
+        exitItem.setMnemonic('x');
+        file.add(exitItem);
 
-		// adding action listener to menu items
-		exitItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				onExit();
-			}
-		});
+        // adding action listener to menu items
+        exitItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onExit();
+            }
+        });
 
-		JMenuBar bar = new JMenuBar();
-		frame.setJMenuBar(bar);
-		bar.add(file);
+        JMenuBar bar = new JMenuBar();
+        frame.setJMenuBar(bar);
+        bar.add(file);
 
-		frame.setSize(200, 200);
-		frame.pack();
-		frame.setVisible(true);
-	}
+        frame.setSize(200, 200);
+        frame.pack();
+        frame.setVisible(true);
+    }
 
-	@Override
-	public void showMessage(String message) {
-		JOptionPane.showMessageDialog(frame, message);
+    @Override
+    public void showMessage(String message) {
+        JOptionPane.showMessageDialog(frame, message);
 
-	}
+    }
 
-	@Override
-	public void showWarning(String message, Throwable t) {
-		JXErrorPane.showDialog(null, new ErrorInfo("Warning",
-				"Something happend", message, null, t, Level.WARNING, null));
-	}
+    @Override
+    public void showWarning(String message, Throwable t) {
+        JXErrorPane.showDialog(frame, new ErrorInfo("Warning", "Something happend", message, null, t, Level.WARNING,
+                null));
+    }
 
-	@Override
-	public void showError(String message, Throwable t) {
-		JXErrorPane.showDialog(null, new ErrorInfo("Error", "Error delivering",
-				message, null, t, Level.SEVERE, null));
-	}
+    @Override
+    public void showError(String message, Throwable t) {
+        JXErrorPane.showDialog(frame, new ErrorInfo("Error", "Error delivering", message, null, t, Level.SEVERE, null));
+    }
 }

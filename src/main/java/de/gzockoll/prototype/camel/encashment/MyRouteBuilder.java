@@ -9,74 +9,46 @@ import de.gzockoll.prototype.camel.encashment.service.EncashmentService;
 
 @SuppressWarnings("javadoc")
 public final class MyRouteBuilder extends RouteBuilder {
-	private static final String TRANSPORT = "seda";
 
-	// private static final String TRANSPORT = "activemq:quene";
+    @Override
+    public void configure() {
+        errorHandler(deadLetterChannel("seda:error").maximumRedeliveries(3).retryAttemptedLogLevel(LoggingLevel.WARN)
+                .useOriginalMessage().redeliveryDelay(3000).backOffMultiplier(2));
 
-	@Override
-	public void configure() {
-		errorHandler(deadLetterChannel("seda:error").maximumRedeliveries(3)
-				.retryAttemptedLogLevel(LoggingLevel.WARN).useOriginalMessage()
-				.redeliveryDelay(5000).backOffMultiplier(2));
+        from("quartz://myGroup/myTimerName?cron=*/30+*+*+*+*+?").bean(EncashmentService.class, "startProcessing()");
 
-		// from("quartz://myGroup/restCall?cron=0+*/5+*+*+*+?").setHeader(
-		// Exchange.HTTP_METHOD, constant("GET")).to(
-		// "http://timecard.gzockoll.de/entry/show/612");
+        from("direct:input").to("seda" + ":inkasso1");
 
-		from("quartz://myGroup/myTimerName?cron=*/30+*+*+*+*+?").bean(
-				EncashmentService.class, "startProcessing()");
+        from("seda" + ":inkasso1").multicast().to("activemq:quene:filemanager").choice()
+                .when(property("TYPE").isEqualTo(EncashmentType.ORDER.name())).to("seda:inkasso1_order")
+                .when(property("TYPE").isEqualTo(EncashmentType.CREDIT.name())).to("seda:inkasso1_credit")
+                .when(property("TYPE").isEqualTo(EncashmentType.PAYMENT.name())).to("seda:inkasso1_payment")
+                .otherwise().to("seda:error").end();
 
-		from("direct:input").to(TRANSPORT + ":inkasso1");
+        from("seda:inkasso1_order").marshal().json().to("ftp://ftpuser@zockoll.dyndns.org/out?password=tux88.")
+                .to("seda:success");
 
-		from(TRANSPORT + ":inkasso1")
-				.multicast()
-				.to("seda:filemanager")
-				.choice()
-				.when(property("TYPE").isEqualTo(EncashmentType.ORDER.name()))
-				.to("seda:inkasso1_order")
-				.when(property("TYPE").isEqualTo(EncashmentType.CREDIT.name()))
-				.to("seda:inkasso1_credit")
-				.when(property("TYPE").isEqualTo(EncashmentType.PAYMENT.name()))
-				.to("seda:inkasso1_payment").otherwise().to("seda:error").end();
+        from("seda:inkasso1_credit").marshal().json().setHeader("subject", constant("Credit received"))
+                .setHeader("to", constant("gzockoll@gmail.com")).to("seda:gmail-wrong");
 
-		from("seda:inkasso1_order").marshal().json()
-				.to("ftp://ftpuser@zockoll.dyndns.org/out?password=tux88.")
-				.to("seda:success");
+        from("seda:inkasso1_payment").marshal().json().setHeader("subject", constant("PAYMENT made"))
+                .setHeader("to", constant("gzockoll@gmail.com")).to("seda:gmail");
 
-		from("seda:inkasso1_credit").marshal().json()
-				.setHeader("subject", constant("Credit received"))
-				.setHeader("to", constant("gzockoll@gmail.com"))
-				.to("seda:gmail-wrong");
+        from("seda:gmail").to("smtps://gztest999@smtp.gmail.com?password=fifi9999").to("seda:success");
 
-		from("seda:inkasso1_payment").marshal().json()
-				.setHeader("subject", constant("PAYMENT made"))
-				.setHeader("to", constant("gzockoll@gmail.com"))
-				.to("seda:gmail");
+        from("seda:gmail-wrong").to("smtps://wrong@smtp.gmail.com?password=wrong").to("seda:success");
 
-		from("seda:gmail").to(
-				"smtps://gztest999@smtp.gmail.com?password=fifi9999").to(
-				"seda:success");
+        from("activemq:quene:filemanager").marshal().xstream("UTF-8")
+                .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").to("file:data/outbox");
 
-		from("seda:gmail-wrong").to(
-				"smtps://wrong@smtp.gmail.com?password=wrong").to(
-				"seda:success");
+        from("seda:success").bean(EncashmentService.class, "onSuccess()");
 
-		from("seda:filemanager")
-				.marshal()
-				.xstream("UTF-8")
-				.to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
-				.to("file:data/outbox");
-
-		from("seda:success").bean(EncashmentService.class, "onSuccess()");
-
-		from("seda:error")
-				.marshal()
-				.json()
-				.setHeader(
-						Exchange.FILE_NAME,
-						simple("${file:name.noext}-${header:breadcrumbId}-${date:now:yyyyMMddHHmmssSSS}.xml"))
-				.to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
-				.to("file:data/error")
-				.bean(EncashmentService.class, "onError()");
-	}
+        from("seda:error")
+                .marshal()
+                .json()
+                .setHeader(Exchange.FILE_NAME,
+                        simple("${file:name.noext}-${header:breadcrumbId}-${date:now:yyyyMMddHHmmssSSS}.xml"))
+                .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").to("file:data/error")
+                .bean(EncashmentService.class, "onError()");
+    }
 }

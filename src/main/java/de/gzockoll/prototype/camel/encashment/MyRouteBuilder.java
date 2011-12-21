@@ -25,11 +25,11 @@ public final class MyRouteBuilder extends RouteBuilder {
                 .when(property("TYPE").isEqualTo(EncashmentType.PAYMENT.name())).to("seda:inkasso1_payment")
                 .otherwise().to("seda:error").end();
 
-        from("seda:inkasso1_order").marshal().json().to("ftp://ftpuser@zockoll.dyndns.org/out?password=tux88.")
-                .to("seda:success");
+        from("seda:inkasso1_order").marshal().json().setHeader("username", constant("ftpuser"))
+                .setHeader("password", constant("tux88.")).to("seda:ftp");
 
-        from("seda:inkasso1_credit").marshal().json().setHeader("subject", constant("Credit received"))
-                .setHeader("to", constant("gzockoll@gmail.com")).to("seda:gmail-wrong");
+        from("seda:inkasso1_credit").marshal().json().setHeader("username", constant("anonymous"))
+                .setHeader("password", constant("ftp@ftp")).to("seda:ftp");
 
         from("seda:inkasso1_payment").marshal().json().setHeader("subject", constant("PAYMENT made"))
                 .setHeader("to", constant("gzockoll@gmail.com")).to("seda:gmail");
@@ -38,17 +38,21 @@ public final class MyRouteBuilder extends RouteBuilder {
 
         from("seda:gmail-wrong").to("smtps://wrong@smtp.gmail.com?password=wrong").to("seda:success");
 
+        from("seda:ftp").to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
+                .to("ftps://zockoll.dyndns.org/out?passiveMode=true").to("seda:success");
+
         from("activemq:quene:filemanager").marshal().xstream("UTF-8")
                 .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").to("file:data/outbox");
 
         from("seda:success").bean(EncashmentService.class, "onSuccess()");
 
         from("seda:error")
+                .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
                 .marshal()
                 .json()
                 .setHeader(Exchange.FILE_NAME,
                         simple("${file:name.noext}-${header:breadcrumbId}-${date:now:yyyyMMddHHmmssSSS}.xml"))
                 .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").to("file:data/error")
-                .bean(EncashmentService.class, "onError()");
+                .to("activemq:topic:error").bean(EncashmentService.class, "onError()");
     }
 }

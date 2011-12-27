@@ -42,7 +42,8 @@ public final class MyRouteBuilder extends RouteBuilder {
                 .to("ftps://zockoll.dyndns.org/out?passiveMode=true").to("seda:success");
 
         from("activemq:quene:filemanager").marshal().xstream("UTF-8")
-                .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").to("file:data/outbox");
+                .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
+                .to("jcr://test:test@repository/filemanager");
 
         from("seda:success").bean(EncashmentService.class, "onSuccess()");
 

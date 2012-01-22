@@ -1,6 +1,6 @@
 package de.gzockoll.prototype.camel.encashment.service;
 
-import static org.joda.money.CurrencyUnit.EUR;
+import static org.joda.money.CurrencyUnit.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -93,6 +93,7 @@ public class EncashmentService {
 			msgHandler.showError(message, exchange.getException());
 		EncashmentEntry entry = em.find(EncashmentEntry.class,
 				exchange.getProperty("encashmentId"));
+		Validate.notNull(entry);
 		entry.deliveryError();
 		em.persist(entry);
 	}
@@ -101,6 +102,7 @@ public class EncashmentService {
 		logger.debug("Successful delivered: " + exchange);
 		EncashmentEntry entry = em.find(EncashmentEntry.class,
 				exchange.getProperty("encashmentId"));
+		Validate.notNull(entry);
 		entry.successfulDelivered();
 		em.persist(entry);
 	}
@@ -108,12 +110,8 @@ public class EncashmentService {
 	public void startProcessing() {
 		logger.debug("Processing started!");
 		Validate.notNull(em);
-		resetUnfinishedEntries();
-		processEntries();
-	}
-
-	private void processEntries() {
-		Query query = em.createNamedQuery(EncashmentEntry.PENDING_ENTRIES);
+		Query query = em
+				.createQuery("SELECT e FROM EncashmentEntry e WHERE e.status = 'NEW' OR e.status = 'ERROR' ");
 		Collection<EncashmentEntry> entries = query.getResultList();
 		for (EncashmentEntry e : entries) {
 			if (e.getStatus() != EncashmentStatus.DELIVERED)

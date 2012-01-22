@@ -50,10 +50,10 @@
 	</bean>
 	
 	<bean id="tpp1" class="de.gzockoll.prototype.camel.encashment.service.ThroughputMeasurmentProcessor">
-		<constructor-arg value="1000"/>	
+		<constructor-arg value="1"/>	
 	</bean>
 	
 	<bean id="tpp2" class="de.gzockoll.prototype.camel.encashment.service.ThroughputMeasurmentProcessor">
-		<constructor-arg value="1000"/>	
+		<constructor-arg value="1"/>	
 	</bean>
 </beans>

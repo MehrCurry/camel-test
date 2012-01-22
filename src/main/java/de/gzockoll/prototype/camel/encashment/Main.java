@@ -8,6 +8,7 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.logging.Level;
 
+import javax.annotation.Resource;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;

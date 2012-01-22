@@ -44,4 +44,9 @@
 		<appender-ref ref="FILE" />
 		<appender-ref ref="multiplex" />
 	</root>
+    <logger name="org.hibernate" level="DEBUG" />
+    <logger name=" org.apache.camel" level="ALL" />
+    <logger name=" org.springframework" level="WARN" />
+    <logger name="de.gzockoll.prototype" level="ALL" />
+
 </configuration>

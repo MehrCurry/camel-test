@@ -81,8 +81,7 @@ public final class MyRouteBuilder extends RouteBuilder {
 				.to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
 				.bean(EncashmentService.class, "onError()");
 
-		from("activemq:topic:controlbus").processRef("tpp1").throttle(3)
-				.processRef("tpp2");
+		from("activemq:topic:controlbus").processRef("tpp1").throttle(3).processRef("tpp2");
 
 	}
 }

@@ -1,12 +1,13 @@
 package de.gzockoll.prototype.camel.encashment;
 
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 import java.util.logging.Level;
 
-import javax.annotation.PostConstruct;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -17,15 +18,16 @@ import org.apache.camel.CamelContext;
 import org.apache.commons.lang.Validate;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.stereotype.Component;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import de.gzockoll.prototype.camel.encashment.service.EncashmentService;
+import eu.hansolo.steelseries.gauges.AbstractGauge;
 
 @SuppressWarnings("javadoc")
-@Component
-public class Main implements MessageHandler {
+public class Main implements MessageHandler, ApplicationContextAware {
 
 	private class WindowEventHandler extends WindowAdapter {
 		private final CamelContext context;
@@ -41,30 +43,21 @@ public class Main implements MessageHandler {
 		}
 	}
 
-	private static ClassPathXmlApplicationContext springContext;
-
-	/**
-	 * @param args
-	 * @throws Exception
-	 */
-	public static void main(String[] args) throws Exception {
-
-		springContext = new ClassPathXmlApplicationContext(new String[] {
-				"/amq-beans.xml", "/data-beans.xml", "/control-beans.xml",
-				"/camel-beans.xml" });
-	}
-
 	private CamelContext context;
 	private JFrame frame;
 	@Autowired
 	private EncashmentService service;
+	private List<AbstractGauge> gauges;
 
-	@PostConstruct
-	public void run() throws Exception {
+	private ApplicationContext springContext;
 
+	public void run(String[] args) {
 		startEncashment();
 		showFrame();
+	}
 
+	public void setGauges(List<AbstractGauge> gauges) {
+		this.gauges = gauges;
 	}
 
 	private void startEncashment() {
@@ -76,7 +69,6 @@ public class Main implements MessageHandler {
      *
      */
 	private void onExit() {
-		springContext.close();
 		System.exit(0);
 	}
 
@@ -85,6 +77,7 @@ public class Main implements MessageHandler {
      */
 	private void showFrame() {
 		frame = new JFrame();
+		frame.setLayout(new GridLayout(2, 2));
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.addWindowListener(new WindowEventHandler(context));
 
@@ -105,8 +98,10 @@ public class Main implements MessageHandler {
 		JMenuBar bar = new JMenuBar();
 		frame.setJMenuBar(bar);
 		bar.add(file);
+		for (AbstractGauge g : gauges)
+			frame.add(g);
 
-		frame.setSize(200, 200);
+		frame.setSize(400, 200);
 		frame.pack();
 		frame.setVisible(true);
 	}
@@ -127,5 +122,11 @@ public class Main implements MessageHandler {
 	public void showError(String message, Throwable t) {
 		JXErrorPane.showDialog(null, new ErrorInfo("Error", "Error delivering",
 				message, null, t, Level.SEVERE, null));
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext ctx)
+			throws BeansException {
+		this.springContext = ctx;
 	}
 }

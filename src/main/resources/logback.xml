@@ -1,50 +1,47 @@
-<configuration scan="true" scanPeriod="15 seconds">
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>%d{HH:mm:ss.SSS} [%thread] %.-1level %logger{36} -
-                %msg%n</Pattern>
-        </layout>
-    </appender>
+<configuration scan="true" scanPeriod="15 seconds" debug="true">
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{HH:mm:ss.SSS} [%thread] %.-1level %logger{36} -
+				%msg%n</Pattern>
+		</layout>
+	</appender>
 
-    <appender name="multiplex"
-        class="de.huxhorn.lilith.logback.appender.ClassicMultiplexSocketAppender">
-        <Compressing>true</Compressing>
-        <!-- will automatically use correct default port -->
-        <ReconnectionDelay>10000</ReconnectionDelay>
-        <IncludeCallerData>true</IncludeCallerData>
-        <RemoteHosts>localhost</RemoteHosts>
-        <ApplicationIdentifier>encashment
-        </ApplicationIdentifier>
-        <encoding>UTF-8</encoding>
-    </appender>
+	<appender name="multiplex"
+		class="de.huxhorn.lilith.logback.appender.ClassicMultiplexSocketAppender">
+		<Compressing>true</Compressing>
+		<!-- will automatically use correct default port -->
+		<ReconnectionDelay>10000</ReconnectionDelay>
+		<IncludeCallerData>true</IncludeCallerData>
+		<RemoteHosts>localhost</RemoteHosts>
+		<ApplicationIdentifier>encashment
+		</ApplicationIdentifier>
+		<encoding>UTF-8</encoding>
+	</appender>
 
-    <appender name="FILE"
-        class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/logFile.log</file>
-        <rollingPolicy
-            class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- daily rollover -->
-            <fileNamePattern>logFile.%d{yyyy-MM-dd}.log
-            </fileNamePattern>
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>logs/logFile.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover -->
+			<fileNamePattern>logFile.%d{yyyy-MM-dd}.log
+			</fileNamePattern>
 
-            <!-- keep 30 days' worth of history -->
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
+			<!-- keep 30 days' worth of history -->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
 
-        <encoder>
-            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n
-            </pattern>
-        </encoder>
-    </appender>
+		<encoder>
+			<pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+	<!-- <logger name="org.hibernate" level="WARN" /> <logger name="org.apache.camel" 
+		level="WARN" /> <logger name="org.springframework" level="WARN" /> -->
+	<logger name="de.gzockoll.prototype" level="DEBUG" />
 
-    <logger name="org.hibernate" level="WARN" />
-    <logger name=" org.apache.camel" level="DEBUG" />
-    <logger name=" org.springframework" level="WARN" />
-    <logger name="de.gzockoll.prototype" level="ALL" />
-
-    <root level="TRACE">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="FILE" />
-        <appender-ref ref="multiplex" />
-    </root>
+	<root level="OFF">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="FILE" />
+		<appender-ref ref="multiplex" />
+	</root>
 </configuration>

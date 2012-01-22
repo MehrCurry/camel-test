@@ -39,6 +39,8 @@
 		<camel.version>2.8.2</camel.version>
 		<spring.version>[3.0.6.RELEASE,)</spring.version>
 		<activemq.version>5.5.0</activemq.version>
+		<slf4j.version>[1.6.0,)</slf4j.version>
+		<logback.version>[1.0.0,)</logback.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -224,8 +226,13 @@
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.0.0</version>
+			<version>${logback.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>de.gzockoll</groupId>
@@ -292,6 +299,33 @@
 			<groupId>org.swinglabs</groupId>
 			<artifactId>swingx</artifactId>
 			<version>1.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.hansole</groupId>
+			<artifactId>steelseries</artifactId>
+			<version>3.9.14</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/SteelSeries-3.9.14.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>com.github.insubstantial</groupId>
+			<artifactId>trident</artifactId>
+			<version>6.3</version>
 		</dependency>
 	</dependencies>
 	<build>

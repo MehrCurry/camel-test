@@ -1,6 +1,5 @@
 package de.gzockoll.prototype.camel.encashment;
 
-import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 
@@ -29,6 +28,8 @@ public final class MyRouteBuilder extends RouteBuilder {
 		from("direct:input").to(TRANSPORT + ":inkasso1");
 
 		from(TRANSPORT + ":inkasso1")
+				.wireTap("activemq:topic:controlbus")
+				.to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
 				.multicast()
 				.to("seda:filemanager")
 				.choice()
@@ -40,28 +41,32 @@ public final class MyRouteBuilder extends RouteBuilder {
 				.to("seda:inkasso1_payment").otherwise().to("seda:error").end();
 
 		from("seda:inkasso1_order").marshal().json()
+				.wireTap("activemq:topic:controlbus")
 				.to("ftp://ftpuser@zockoll.dyndns.org/out?password=tux88.")
 				.to("seda:success");
 
 		from("seda:inkasso1_credit").marshal().json()
+				.wireTap("activemq:topic:controlbus")
 				.setHeader("subject", constant("Credit received"))
 				.setHeader("to", constant("gzockoll@gmail.com"))
 				.to("seda:gmail-wrong");
 
 		from("seda:inkasso1_payment").marshal().json()
+				.wireTap("activemq:topic:controlbus")
 				.setHeader("subject", constant("PAYMENT made"))
 				.setHeader("to", constant("gzockoll@gmail.com"))
 				.to("seda:gmail");
 
-		from("seda:gmail").to(
-				"smtps://gztest999@smtp.gmail.com?password=fifi9999").to(
-				"seda:success");
+		from("seda:gmail").wireTap("activemq:topic:controlbus")
+				.to("smtps://gztest999@smtp.gmail.com?password=fifi9999")
+				.to("seda:success");
 
-		from("seda:gmail-wrong").to(
-				"smtps://wrong@smtp.gmail.com?password=wrong").to(
-				"seda:success");
+		from("seda:gmail-wrong").wireTap("activemq:topic:controlbus")
+				.to("smtps://wrong@smtp.gmail.com?password=wrong")
+				.to("seda:success");
 
 		from("seda:filemanager")
+				.wireTap("activemq:topic:controlbus")
 				.marshal()
 				.xstream("UTF-8")
 				.to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
@@ -70,13 +75,14 @@ public final class MyRouteBuilder extends RouteBuilder {
 		from("seda:success").bean(EncashmentService.class, "onSuccess()");
 
 		from("seda:error")
+				.wireTap("activemq:topic:controlbus")
 				.marshal()
 				.json()
-				.setHeader(
-						Exchange.FILE_NAME,
-						simple("${file:name.noext}-${header:breadcrumbId}-${date:now:yyyyMMddHHmmssSSS}.xml"))
 				.to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
-				.to("file:data/error")
 				.bean(EncashmentService.class, "onError()");
+
+		from("activemq:topic:controlbus").processRef("tpp1").throttle(3)
+				.processRef("tpp2");
+
 	}
 }

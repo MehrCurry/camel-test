@@ -19,9 +19,13 @@ import org.joda.money.Money;
 @SuppressWarnings("javadoc")
 @Entity
 @NamedQueries({
+		@NamedQuery(name = EncashmentEntry.PENDING_ENTRIES, query = "SELECT e FROM EncashmentEntry e WHERE e.status = 'NEW' OR e.status = 'ERROR' "),
+		@NamedQuery(name = EncashmentEntry.UNFINISHED_ENTRIES, query = "Select e from EncashmentEntry e where e.status = 'PROCESSING' AND e.stateChanged < :timeout"),
 		@NamedQuery(name = EncashmentEntry.FIND_BY_STATUS, query = "Select e from EncashmentEntry e where e.status = :status"),
 		@NamedQuery(name = EncashmentEntry.FIND_BY_CUSTOMER_AND_MERCHANT, query = "Select e from EncashmentEntry e where e.customer = :customer and e.merchant = :merchant") })
 public class EncashmentEntry extends AbstractEntity {
+	public static final String PENDING_ENTRIES = "EncashmentEntry.pendingEntries";
+	public static final String UNFINISHED_ENTRIES = "EncashmentEntry.unfinishedEntries";
 	public static final String FIND_BY_STATUS = "EncashmentEntry.findByStatus";
 	public static final String FIND_BY_CUSTOMER_AND_MERCHANT = "EncashmentEntry.findByCustomerAndMerchant";
 

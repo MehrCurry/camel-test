@@ -8,19 +8,20 @@
 		http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring-2.0-M1.xsd">
 
 	<bean id="camelTracer" class="org.apache.camel.processor.interceptor.Tracer">
-		<property name="formatter" ref="traceFormatter"/>
+		<property name="formatter" ref="traceFormatter" />
 		<property name="traceExceptions" value="true" />
 		<property name="traceInterceptors" value="true" />
 		<property name="logLevel" value="DEBUG" />
 		<property name="logName" value="de.gzockoll.prototype.camel.trace" />
 	</bean>
 
-	<bean id="traceFormatter" class="org.apache.camel.processor.interceptor.DefaultTraceFormatter">
-		<property name="showBody" value="true"/>
-		<property name="breadCrumbLength" value="10"/>
-		<property name="showProperties" value="true"/>
+	<bean id="traceFormatter"
+		class="org.apache.camel.processor.interceptor.DefaultTraceFormatter">
+		<property name="showBody" value="true" />
+		<property name="breadCrumbLength" value="10" />
+		<property name="showProperties" value="true" />
 	</bean>
-	
+
 	<camel:camelContext trace="true" id="encashmentContext"
 		xmlns="http://camel.apache.org/schema/spring">
 		<routeBuilder ref="myBuilder" />
@@ -46,5 +47,13 @@
 
 	<bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
 		<property name="configuration" ref="jmsConfig" />
+	</bean>
+	
+	<bean id="tpp1" class="de.gzockoll.prototype.camel.encashment.service.ThroughputMeasurmentProcessor">
+		<constructor-arg value="1000"/>	
+	</bean>
+	
+	<bean id="tpp2" class="de.gzockoll.prototype.camel.encashment.service.ThroughputMeasurmentProcessor">
+		<constructor-arg value="1000"/>	
 	</bean>
 </beans>

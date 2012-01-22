@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<bean id="200x200" class="java.awt.Dimension">
+		<constructor-arg value="200"/>
+		<constructor-arg value="200"/>
+	</bean>
+	
+	<bean id="carbon" class="eu.hansolo.steelseries.tools.BackgroundColor" factory-method="valueOf">
+		<constructor-arg value="CARBON"/>
+	</bean>
+
+	<bean id="lcdGreen" class="eu.hansolo.steelseries.tools.LcdColor" factory-method="valueOf">
+		<constructor-arg value="STANDARD_GREEN_LCD"/>
+	</bean>	
+	
+	<bean id="gauge1" class="eu.hansolo.steelseries.gauges.Radial">
+		<property name="size" ref="200x200"/>
+		<property name="maxValue" value="20"/>
+		<property name="title" value="Input"/>
+		<property name="unitString" value="msg/s"/>
+		<property name="backgroundColor" ref="carbon"/>
+		<property name="lcdColor" ref="lcdGreen"/>
+		<property name="digitalFont" value="true"/>
+	</bean>
+	
+	<bean id="gauge1Listener" class="de.gzockoll.prototype.camel.ui.swing.GaugePropertyChangeListener">
+		<constructor-arg ref="gauge1"/>
+		<constructor-arg ref="tpp1"/>
+	</bean>
+	
+	<bean id="gauge2" class="eu.hansolo.steelseries.gauges.Radial">
+		<property name="size" ref="200x200"/>
+		<property name="maxValue" value="20"/>
+		<property name="title" value="Throttled Input"/>
+		<property name="unitString" value="msg/s"/>
+		<property name="backgroundColor" ref="carbon"/>
+		<property name="lcdColor" ref="lcdGreen"/>
+		<property name="digitalFont" value="true"/>
+	</bean>
+	
+	<bean id="gauge2Listener" class="de.gzockoll.prototype.camel.ui.swing.GaugePropertyChangeListener">
+		<constructor-arg ref="gauge2"/>
+		<constructor-arg ref="tpp2"/>
+	</bean>
+	
+	<bean id="clock" class="eu.hansolo.steelseries.extras.Clock">
+		<property name="size" ref="200x200"/>
+		<property name="title" value="Uhrzeit"/>
+		<property name="automatic" value="true"/>
+		<property name="backgroundColor" ref="carbon"/>
+		<property name="lcdColor" ref="lcdGreen"/>
+		<property name="digitalFont" value="true"/>
+	</bean>
+
+	<bean id="main" class="de.gzockoll.prototype.camel.encashment.Main">
+		<property name="gauges">
+			<list>
+				<ref bean="clock"/>
+				<ref bean="gauge1"/>
+				<ref bean="gauge2"/>
+			</list>
+		</property>
+	</bean>	
+	
+</beans>

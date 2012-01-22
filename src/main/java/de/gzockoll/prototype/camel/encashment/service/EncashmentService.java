@@ -3,6 +3,7 @@ package de.gzockoll.prototype.camel.encashment.service;
 import static org.joda.money.CurrencyUnit.EUR;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -16,6 +17,7 @@ import org.apache.camel.Message;
 import org.apache.camel.Producer;
 import org.apache.commons.lang.Validate;
 import org.joda.money.Money;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,18 @@ public class EncashmentService {
 
 	@Autowired
 	private MessageHandler msgHandler;
+
+	@SuppressWarnings("unchecked")
+	public void resetUnfinishedEntries() {
+		DateTime timeout = DateTime.now().minusMinutes(30);
+		Query q = em.createNamedQuery(EncashmentEntry.UNFINISHED_ENTRIES);
+		q.setParameter("timeout", timeout.toDate());
+		List<EncashmentEntry> entires = q.getResultList();
+		for (EncashmentEntry e : entires) {
+			e.deliveryError();
+			em.persist(e);
+		}
+	}
 
 	public void setMsgHandler(MessageHandler msgHandler) {
 		this.msgHandler = msgHandler;
@@ -94,8 +108,12 @@ public class EncashmentService {
 	public void startProcessing() {
 		logger.debug("Processing started!");
 		Validate.notNull(em);
-		Query query = em
-				.createQuery("SELECT e FROM EncashmentEntry e WHERE e.status = 'NEW' OR e.status = 'ERROR' ");
+		resetUnfinishedEntries();
+		processEntries();
+	}
+
+	private void processEntries() {
+		Query query = em.createNamedQuery(EncashmentEntry.PENDING_ENTRIES);
 		Collection<EncashmentEntry> entries = query.getResultList();
 		for (EncashmentEntry e : entries) {
 			if (e.getStatus() != EncashmentStatus.DELIVERED)

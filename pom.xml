@@ -36,9 +36,9 @@
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<camel.version>2.8.2</camel.version>
+		<camel.version>2.9.0</camel.version>
 		<spring.version>[3.0.6.RELEASE,)</spring.version>
-		<activemq.version>5.5.0</activemq.version>
+		<activemq.version>5.5.1</activemq.version>
 		<slf4j.version>[1.6.0,)</slf4j.version>
 		<logback.version>[1.0.0,)</logback.version>
 	</properties>
@@ -73,6 +73,12 @@
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-mail</artifactId>
+			<version>${camel.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-script</artifactId>
 			<version>${camel.version}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -326,6 +332,22 @@
 			<groupId>com.github.insubstantial</groupId>
 			<artifactId>trident</artifactId>
 			<version>6.3</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jweather</groupId>
+			<artifactId>jweather</artifactId>
+			<version>0.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>2.0.0-beta-2</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<build>

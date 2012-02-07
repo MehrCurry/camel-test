@@ -14,24 +14,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MetarProcessor implements Processor {
-	private static final Logger logger = LoggerFactory
-			.getLogger(MetarProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(MetarProcessor.class);
 
-	@Override
-	public void process(Exchange ex) throws Exception {
-		String data = IOUtils.toString((InputStream) ex.getIn().getBody());
-		logger.debug("Data: " + data);
-		Metar metar = MetarParser.parseRecord(data);
-		logger.debug("Metar: " + metar);
-		List<Observation> list = new ArrayList<Observation>();
-		String station = metar.getStationID();
-		list.add(new Observation(station + ".Temperatur", metar
-				.getTemperatureInCelsius()));
-		list.add(new Observation(station + ".Luftdruck", metar
-				.getPressureInHectoPascals()));
-		list.add(new Observation(station + ".Wind", metar.getWindSpeedInMPS()));
-		list.add(new Observation(station + ".Windrichtung", metar
-				.getWindDirection()));
-		ex.getOut().setBody(list);
-	}
+    @Override
+    public void process(Exchange ex) throws Exception {
+        String data = IOUtils.toString((InputStream) ex.getIn().getBody());
+        logger.debug("Data: " + data);
+        Metar metar = MetarParser.parseRecord(data);
+        logger.debug("Metar: " + metar);
+        List<Observation> list = new ArrayList<Observation>();
+        String station = metar.getStationID();
+        list.add(new Observation(station + ".Temperatur", metar.getTemperatureMostPreciseInCelsius()));
+        list.add(new Observation(station + ".Luftdruck", metar.getPressureInHectoPascals()));
+        list.add(new Observation(station + ".Wind", metar.getWindSpeedInMPS()));
+        list.add(new Observation(station + ".Windrichtung", metar.getWindDirection()));
+        list.add(new Observation(station + ".Taupunkt", metar.getDewPointPreciseInCelsius()));
+        list.add(new Observation(station + ".Sicht", metar.getVisibilityInKilometers()));
+        ex.getOut().setBody(list);
+    }
 }

@@ -13,6 +13,8 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.gzockoll.prototype.camel.observation.Observation;
+
 public class MetarProcessor implements Processor {
     private static final Logger logger = LoggerFactory.getLogger(MetarProcessor.class);
 

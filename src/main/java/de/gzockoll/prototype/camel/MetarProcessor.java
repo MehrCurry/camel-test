@@ -13,7 +13,13 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.gzockoll.prototype.camel.observation.Measurement;
+import de.gzockoll.prototype.camel.observation.NamedSubject;
+import de.gzockoll.prototype.camel.observation.NumberQuantity;
 import de.gzockoll.prototype.camel.observation.Observation;
+import static de.gzockoll.prototype.camel.observation.Units.*;
+
+import static de.gzockoll.prototype.camel.MetarMesswerte.*;
 
 public class MetarProcessor implements Processor {
     private static final Logger logger = LoggerFactory.getLogger(MetarProcessor.class);
@@ -26,12 +32,13 @@ public class MetarProcessor implements Processor {
         logger.debug("Metar: " + metar);
         List<Observation> list = new ArrayList<Observation>();
         String station = metar.getStationID();
-        list.add(new Observation(station + ".Temperatur", metar.getTemperatureMostPreciseInCelsius()));
-        list.add(new Observation(station + ".Luftdruck", metar.getPressureInHectoPascals()));
-        list.add(new Observation(station + ".Wind", metar.getWindSpeedInMPS()));
-        list.add(new Observation(station + ".Windrichtung", metar.getWindDirection()));
-        list.add(new Observation(station + ".Taupunkt", metar.getDewPointPreciseInCelsius()));
-        list.add(new Observation(station + ".Sicht", metar.getVisibilityInKilometers()));
+        list.add(new Measurement(station, TEMPERATUR, DEGREE_CELSIUS, metar.getTemperatureMostPreciseInCelsius()));
+        list.add(new Measurement(station, LUFTDRUCK, HECTOPASCAL, metar.getPressureInHectoPascals()));
+        list.add(new Measurement(station, WIND, METER_PER_SECOND, metar.getWindSpeedInMPS()));
+        list.add(new Measurement(station, WINDRICHTUNG, DEGREE, metar.getWindDirection()));
+
+        list.add(new Measurement(station, TAUPUNKT, DEGREE_CELSIUS, metar.getDewPointPreciseInCelsius()));
+        list.add(new Measurement(station, SICHT, KILOMETER, metar.getVisibilityInKilometers()));
         ex.getOut().setBody(list);
     }
 }

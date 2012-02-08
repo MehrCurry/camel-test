@@ -11,6 +11,8 @@ import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.gzockoll.prototype.camel.observation.Observation;
+
 /**
  * @author Guido Zockoll
  * 

@@ -48,12 +48,12 @@
 	<bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
 		<property name="configuration" ref="jmsConfig" />
 	</bean>
-	
+
 	<bean id="tpp1" class="de.gzockoll.prototype.camel.encashment.service.ThroughputMeasurmentProcessor">
-		<constructor-arg value="1"/>	
+		<constructor-arg value="1"/>
 	</bean>
-	
+
 	<bean id="tpp2" class="de.gzockoll.prototype.camel.encashment.service.ThroughputMeasurmentProcessor">
-		<constructor-arg value="1"/>	
+		<constructor-arg value="1"/>
 	</bean>
 </beans>

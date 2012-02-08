@@ -18,6 +18,17 @@ import org.slf4j.LoggerFactory;
 public class CountProcessor implements Processor {
     private static final Logger logger = LoggerFactory.getLogger(CountProcessor.class);
 
+    private long scaling;
+
+    /**
+     * Create a new CountProcessor.
+     * 
+     * @param i
+     */
+    public CountProcessor(long scaleing) {
+        this.scaling = scaleing;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -28,6 +39,6 @@ public class CountProcessor implements Processor {
         List result = (List) exchange.getIn().getBody();
         logger.debug(result == null ? "List <null>" : "Listsize " + result.size());
 
-        exchange.getIn().setBody(new Observation("MessagesPerMinute", result.size() / 10.0));
+        exchange.getIn().setBody(new Observation("Durchsatz", (1.0 * result.size()) / scaling));
     }
 }

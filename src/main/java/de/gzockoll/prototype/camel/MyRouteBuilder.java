@@ -17,10 +17,15 @@ final class MyRouteBuilder extends RouteBuilder {
         DefaultTraceFormatter formatter = new DefaultTraceFormatter();
         formatter.setShowOutBody(true);
         formatter.setShowOutBodyType(true);
+        formatter.setShowHeaders(true);
 
         // set to use our formatter
         tracer.setFormatter(formatter);
         getContext().addInterceptStrategy(tracer);
+
+        from("quartz://myGroup/load?cron=45+*+*+*+*+?").setBody()
+                .groovy("(1..100).collect{new de.gzockoll.prototype.camel.Observation('Load',it)}").split(body())
+                .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").to("seda:observations");
 
         from("quartz://myGroup/seconds?cron=*+*+*+*+*+?")
                 .setBody()
@@ -30,24 +35,28 @@ final class MyRouteBuilder extends RouteBuilder {
         from("quartz://myGroup/myTimerName1?cron=0+*+*+*+*+?").to(
                 "http://weather.noaa.gov/pub/data/observations/metar/stations/EDDH.TXT?disableStreamCache=true").to(
                 "seda:metar");
-        from("quartz://myGroup/myTimerName2?cron=10+*+*+*+*+?").to(
+        from("quartz://myGroup/myTimerName2?cron=30+*+*+*+*+?").to(
                 "http://weather.noaa.gov/pub/data/observations/metar/stations/EDHK.TXT?disableStreamCache=true").to(
                 "seda:metar");
-        from("quartz://myGroup/myTimerName3?cron=20+*+*+*+*+?").to(
+        from("quartz://myGroup/myTimerName3?cron=31+*+*+*+*+?").to(
                 "http://weather.noaa.gov/pub/data/observations/metar/stations/LOWI.TXT?disableStreamCache=true").to(
                 "seda:metar");
 
-        from("seda:metar").to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
+        from("seda:metar").to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").wireTap("seda:ftp")
                 .process(new MetarProcessor()).to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
                 .split(body()).to("seda:observations");
 
-        from("seda:observations").convertBodyTo(String.class).to("activemq:topic:observations");
+        from("seda:ftp").to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true");
+        // .to("ftp://ftpuser@zockoll.dyndns.org/in?password=fsfifi99&passiveMode=true")
+        // .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true");
+
+        from("seda:observations").convertBodyTo(String.class).to("activemq:topic:observations?timeToLive=5000");
 
         from("activemq:topic:observations").aggregate(constant(true), new ArrayListAggregationStrategy())
-                .completionInterval(10000L).eagerCheckCompletion().process(new CountProcessor())
+                .completionInterval(2000L).eagerCheckCompletion().process(new CountProcessor(2))
                 .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").to("seda:observations");
 
-        from("activemq:topic:observations").throttle(10).timePeriodMillis(1000).asyncDelayed()
+        from("activemq:topic:observations").throttle(3).timePeriodMillis(1000).asyncDelayed()
         // .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
                 .to("activemq:topic:observationsWeb");
 

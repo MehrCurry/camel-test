@@ -5,7 +5,7 @@
     </layout>
   </appender>
  
-  <root level="TRACE">
+  <root level="OFF">
     <appender-ref ref="CONSOLE" />
   </root>
 </configuration>

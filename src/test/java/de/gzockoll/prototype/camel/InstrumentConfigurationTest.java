@@ -7,6 +7,8 @@ package de.gzockoll.prototype.camel;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import de.gzockoll.prototype.camel.measurement.InstrumentConfiguration;
 import static org.junit.matchers.JUnitMatchers.*;
 
 /**
@@ -16,7 +18,7 @@ import static org.junit.matchers.JUnitMatchers.*;
 public class InstrumentConfigurationTest {
 
     /**
-     * Test method for {@link de.gzockoll.prototype.camel.InstrumentConfiguration#builder()}.
+     * Test method for {@link de.gzockoll.prototype.camel.measurement.InstrumentConfiguration#builder()}.
      */
     @Test
     public void testBuilder() {

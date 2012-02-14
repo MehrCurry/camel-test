@@ -1,11 +1,13 @@
-package de.gzockoll.prototype.camel;
+package de.gzockoll.prototype.camel.measurement;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.processor.interceptor.DefaultTraceFormatter;
 import org.apache.camel.processor.interceptor.Tracer;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings("javadoc")
+@Component
 final class MyRouteBuilder extends RouteBuilder {
 	@Override
 	public void configure() {

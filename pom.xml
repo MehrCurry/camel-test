@@ -322,13 +322,6 @@
 			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>eu.hansole</groupId>
-			<artifactId>steelseries</artifactId>
-			<version>3.9.14</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/SteelSeries-3.9.14.jar</systemPath>
-		</dependency>
-		<dependency>
 			<groupId>com.github.insubstantial</groupId>
 			<artifactId>trident</artifactId>
 			<version>6.3</version>
@@ -337,6 +330,7 @@
 			<groupId>net.sourceforge.jweather</groupId>
 			<artifactId>jweather</artifactId>
 			<version>0.3.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -344,15 +338,9 @@
 			<version>2.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy-all</artifactId>
-			<version>2.0.0-beta-2</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.aspectj</groupId>
-		    <artifactId>aspectjrt</artifactId>
-		    <version>1.6.8</version>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>1.6.8</version>
 		</dependency>
 	</dependencies>
 	<build>

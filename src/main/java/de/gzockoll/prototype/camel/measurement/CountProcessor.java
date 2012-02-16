@@ -22,34 +22,38 @@ import de.gzockoll.prototype.camel.observation.Units;
  * 
  */
 public class CountProcessor implements Processor {
-    private static final Logger logger = LoggerFactory.getLogger(CountProcessor.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(CountProcessor.class);
 
-    private long scaling;
+	private long scaling;
 
-    private NamedSubject subject;
+	private NamedSubject subject;
 
-    /**
-     * Create a new CountProcessor.
-     * 
-     * @param i
-     */
-    public CountProcessor(String name, long scaleing) {
-        this.subject = new NamedSubject(name);
-        this.scaling = scaleing;
-    }
+	/**
+	 * Create a new CountProcessor.
+	 * 
+	 * @param i
+	 */
+	public CountProcessor(String name, long scaleing) {
+		this.subject = new NamedSubject(name);
+		this.scaling = scaleing;
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.camel.Processor#process(org.apache.camel.Exchange)
-     */
-    @Override
-    public void process(Exchange exchange) throws Exception {
-        List result = (List) exchange.getIn().getBody();
-        logger.debug(result == null ? "List <null>" : "Listsize " + result.size());
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.apache.camel.Processor#process(org.apache.camel.Exchange)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public void process(Exchange exchange) throws Exception {
+		List<Exchange> result = (List<Exchange>) exchange.getIn().getBody();
+		logger.debug(result == null ? "List <null>" : "Listsize "
+				+ result.size());
 
-        double value = (1.0 * result.size()) / scaling;
-        Observation o = new Measurement(subject, Messwerte.DURCHSATZ, new NumberQuantity(Units.PER_SECOND, value));
-        exchange.getIn().setBody(o);
-    }
+		double value = (1.0 * result.size()) / scaling;
+		Observation o = new Measurement(subject, Messwerte.DURCHSATZ,
+				new NumberQuantity(Units.PER_SECOND, value));
+		exchange.getIn().setBody(o);
+	}
 }

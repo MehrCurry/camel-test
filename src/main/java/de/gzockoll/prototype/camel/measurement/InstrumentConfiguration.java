@@ -4,7 +4,12 @@
  */
 package de.gzockoll.prototype.camel.measurement;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.math.Range;
 
 /**
  * @author Guido Zockoll
@@ -17,6 +22,8 @@ public class InstrumentConfiguration {
     private Number min = Double.NaN;
     private Number max = Double.NaN;
     private Number threshold = Double.NaN;
+    private Set<ColoredRange> areas = new HashSet<ColoredRange>();
+    private Set<ColoredRange> sections = new HashSet<ColoredRange>();
 
     public static Builder builder() {
         return new Builder();
@@ -62,6 +69,16 @@ public class InstrumentConfiguration {
 
         public Builder threshold(Number n) {
             conf.threshold = n;
+            return this;
+        }
+
+        public Builder area(ColoredRange... ranges) {
+            conf.areas.addAll(Arrays.asList(ranges));
+            return this;
+        }
+
+        public Builder section(ColoredRange... ranges) {
+            conf.sections.addAll(Arrays.asList(ranges));
             return this;
         }
 

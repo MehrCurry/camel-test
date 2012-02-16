@@ -2,20 +2,21 @@ package de.gzockoll.prototype.camel.measurement;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+@SuppressWarnings("javadoc")
 public class Launcher {
-	private static ClassPathXmlApplicationContext springContext;
+    private static ClassPathXmlApplicationContext springContext;
 
-	/**
-	 * @param args
-	 * @throws Exception
-	 */
-	public static void main(String[] args) throws Exception {
+    /**
+     * @param args
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
 
-		springContext = new ClassPathXmlApplicationContext(new String[] {
+        springContext = new ClassPathXmlApplicationContext(new String[] {
 
-		"/measurement-beans.xml" });
+        "/measurement-beans.xml" });
 
-		Main m = springContext.getBean(Main.class);
-		m.run(args);
-	}
+        Main m = springContext.getBean(Main.class);
+        m.run(args);
+    }
 }

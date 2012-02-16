@@ -17,7 +17,7 @@ public class SedaLoadTest extends CamelTestSupport {
 	@EndpointInject(uri = "mock:result")
 	protected MockEndpoint resultEndpoint;
 
-	@Produce(uri = "direct:start")
+	@Produce(uri = TEST_ENDPOINT)
 	protected ProducerTemplate template;
 
 	@Test
@@ -27,7 +27,7 @@ public class SedaLoadTest extends CamelTestSupport {
 		StopWatch w = new StopWatch();
 		w.start();
 		for (int i = 0; i < 5000; i++)
-			template.sendBody(TEST_ENDPOINT, payload);
+			template.sendBody(payload);
 		w.stop();
 		System.out.println(w);
 		System.out.println(resultEndpoint);

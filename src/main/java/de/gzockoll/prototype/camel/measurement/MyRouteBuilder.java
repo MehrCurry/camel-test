@@ -1,11 +1,15 @@
-package de.gzockoll.prototype.camel;
+package de.gzockoll.prototype.camel.measurement;
+
+import java.util.Collection;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.processor.interceptor.DefaultTraceFormatter;
 import org.apache.camel.processor.interceptor.Tracer;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings("javadoc")
+@Component
 final class MyRouteBuilder extends RouteBuilder {
     @Override
     public void configure() {
@@ -27,23 +31,22 @@ final class MyRouteBuilder extends RouteBuilder {
         // .groovy("(1..1000).collect{new de.gzockoll.prototype.camel.Observation('Load',it)}").split(body())
         // .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").to("seda:observations");
 
-        // from("jetty:http://0.0.0.0:10234/monitor/jenkins").to(
-        // "log:de.gzockoll.prototype.camel?showAll=true&multiline=true");
+        // from("quartz://myGroup/seconds?cron=*+*+*+*+*+?")
+        // .setBody()
+        // .groovy("new de.gzockoll.prototype.camel.observation.SimpleObservation(\"Test3\", new org.joda.time.DateTime().getSecondOfMinute()))")
+        // .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").to("seda:observations");
 
-        from("quartz://myGroup/configs?cron=*/10+*+*+*+*+?")
+        from("quartz://myGroup/myTestTimerNameX?cron=0/10+*+*+*+*+?")
                 .setBody(constant(new MyInstrumentConfigurationFactory().getInstrumentConfigurations())).split(body())
                 .marshal().json().to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
                 .to("seda:observations");
 
-        from("quartz://myGroup/seconds?cron=*+*+*+*+*+?").setBody()
-                .groovy("de.gzockoll.prototype.camel.SecondFactory.getSeconds()").to("seda:observations");
-
         from("quartz://myGroup/myTimerName1?cron=0+*+*+*+*+?").to(
                 "http://weather.noaa.gov/pub/data/observations/metar/stations/EDDH.TXT?disableStreamCache=true").to(
                 "seda:metar");
-        // from("quartz://myGroup/myTimerName2?cron=30+*+*+*+*+?").to(
-        // "http://weather.noaa.gov/pub/data/observations/metar/stations/EDHK.TXT?disableStreamCache=true").to(
-        // "seda:metar");
+        from("quartz://myGroup/myTimerName2?cron=30+*+*+*+*+?").to(
+                "http://weather.noaa.gov/pub/data/observations/metar/stations/EDHK.TXT?disableStreamCache=true").to(
+                "seda:metar");
         // from("quartz://myGroup/myTimerName3?cron=31+*+*+*+*+?").to(
         // "http://weather.noaa.gov/pub/data/observations/metar/stations/LOWI.TXT?disableStreamCache=true").to(
         // "seda:metar");
@@ -52,7 +55,8 @@ final class MyRouteBuilder extends RouteBuilder {
                 .process(new MetarProcessor()).to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
                 .split(body()).to("seda:observations");
 
-        from("seda:observations").convertBodyTo(String.class).to("activemq:topic:observations?timeToLive=15000");
+        from("seda:observations").marshal().json().to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
+                .to("activemq:topic:observations?timeToLive=15000");
 
         from("activemq:topic:observations").aggregate(constant(true), new ArrayListAggregationStrategy())
                 .completionInterval(5000L).eagerCheckCompletion().process(new CountProcessor("Messages", 5))

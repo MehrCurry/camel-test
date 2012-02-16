@@ -2,7 +2,7 @@
  * Created 06.02.2012
  * This code is copyright (c) 2004 PAYONE Gmbh & Co. KG.
  */
-package de.gzockoll.prototype.camel;
+package de.gzockoll.prototype.camel.measurement;
 
 import java.util.List;
 

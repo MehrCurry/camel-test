@@ -1,4 +1,4 @@
-package de.gzockoll.prototype.camel;
+package de.gzockoll.prototype.camel.measurement;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -17,9 +17,9 @@ import de.gzockoll.prototype.camel.observation.Measurement;
 import de.gzockoll.prototype.camel.observation.NamedSubject;
 import de.gzockoll.prototype.camel.observation.NumberQuantity;
 import de.gzockoll.prototype.camel.observation.Observation;
+import static de.gzockoll.prototype.camel.measurement.MetarMesswerte.*;
 import static de.gzockoll.prototype.camel.observation.Units.*;
 
-import static de.gzockoll.prototype.camel.MetarMesswerte.*;
 
 public class MetarProcessor implements Processor {
     private static final Logger logger = LoggerFactory.getLogger(MetarProcessor.class);

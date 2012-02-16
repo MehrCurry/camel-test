@@ -1,12 +1,13 @@
 package de.gzockoll.prototype.camel.measurement;
 
-import java.util.Collection;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.processor.interceptor.DefaultTraceFormatter;
 import org.apache.camel.processor.interceptor.Tracer;
 import org.springframework.stereotype.Component;
+
+import de.gzockoll.prototype.camel.DebugProcessor;
+import de.gzockoll.prototype.camel.SecondFactory;
 
 @SuppressWarnings("javadoc")
 @Component
@@ -25,20 +26,17 @@ final class MyRouteBuilder extends RouteBuilder {
 
         // set to use our formatter
         tracer.setFormatter(formatter);
-        getContext().addInterceptStrategy(tracer);
+        // getContext().addInterceptStrategy(tracer);
 
         // from("quartz://myGroup/load?cron=0+*+*+*+*+?").setBody()
         // .groovy("(1..1000).collect{new de.gzockoll.prototype.camel.Observation('Load',it)}").split(body())
         // .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").to("seda:observations");
 
-        // from("quartz://myGroup/seconds?cron=*+*+*+*+*+?")
-        // .setBody()
-        // .groovy("new de.gzockoll.prototype.camel.observation.SimpleObservation(\"Test3\", new org.joda.time.DateTime().getSecondOfMinute()))")
-        // .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").to("seda:observations");
+        from("quartz://myGroup/seconds?cron=*+*+*+*+*+?").setBody(constant(SecondFactory.getSeconds()))
+                .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true").to("seda:observations");
 
         from("quartz://myGroup/myTestTimerNameX?cron=0/10+*+*+*+*+?")
                 .setBody(constant(new MyInstrumentConfigurationFactory().getInstrumentConfigurations())).split(body())
-                .marshal().json().to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
                 .to("seda:observations");
 
         from("quartz://myGroup/myTimerName1?cron=0+*+*+*+*+?").to(
@@ -55,7 +53,8 @@ final class MyRouteBuilder extends RouteBuilder {
                 .process(new MetarProcessor()).to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
                 .split(body()).to("seda:observations");
 
-        from("seda:observations").marshal().json().to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
+        from("seda:observations").marshal().json().process(new DebugProcessor("json"))
+                .to("log:de.gzockoll.prototype.camel?showAll=true&multiline=true")
                 .to("activemq:topic:observations?timeToLive=15000");
 
         from("activemq:topic:observations").aggregate(constant(true), new ArrayListAggregationStrategy())

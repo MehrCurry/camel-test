@@ -9,7 +9,7 @@ import org.joda.time.DateTime;
 import de.gzockoll.prototype.camel.observation.Observation;
 import de.gzockoll.prototype.camel.observation.SimpleObservation;
 
-class SecondFactory {
+public class SecondFactory {
     public static Observation getSeconds() {
         return new SimpleObservation("sekunden", new DateTime().getSecondOfMinute());
     }

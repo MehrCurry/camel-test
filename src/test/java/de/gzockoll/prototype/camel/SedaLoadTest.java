@@ -9,7 +9,7 @@ import org.apache.camel.test.junit4.CamelTestSupport;
 import org.apache.commons.lang.time.StopWatch;
 import org.junit.Test;
 
-import de.gzockoll.prototype.camel.observation.SimpleObservation;
+import de.gzockoll.observation.SimpleObservation;
 
 public class SedaLoadTest extends CamelTestSupport {
 	private static final String TEST_ENDPOINT = "vm:abc";

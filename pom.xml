@@ -354,6 +354,17 @@
 			<artifactId>aspectjrt</artifactId>
 			<version>1.6.8</version>
 		</dependency>
+		<dependency>
+			<groupId>org.mozilla</groupId>
+			<artifactId>rhino</artifactId>
+			<version>1.7R3</version>
+		</dependency>
+		<dependency>
+			<groupId>de.gzockoll.prototype</groupId>
+			<artifactId>measurement</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>bundle</type>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

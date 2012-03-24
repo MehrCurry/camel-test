@@ -5,11 +5,11 @@
 package de.gzockoll.prototype.camel;
 
 import static org.junit.Assert.*;
+import static org.junit.matchers.JUnitMatchers.*;
 
 import org.junit.Test;
 
-import de.gzockoll.prototype.camel.measurement.InstrumentConfiguration;
-import static org.junit.matchers.JUnitMatchers.*;
+import de.gzockoll.measurement.InstrumentConfiguration;
 
 /**
  * @author Guido Zockoll
@@ -17,16 +17,19 @@ import static org.junit.matchers.JUnitMatchers.*;
  */
 public class InstrumentConfigurationTest {
 
-    /**
-     * Test method for {@link de.gzockoll.prototype.camel.measurement.InstrumentConfiguration#builder()}.
-     */
-    @Test
-    public void testBuilder() {
-        InstrumentConfiguration conf = InstrumentConfiguration.builder().name("JUnit").unit("m/s").build();
+	/**
+	 * Test method for
+	 * {@link de.gzockoll.prototype.camel.measurement.InstrumentConfiguration#builder()}
+	 * .
+	 */
+	@Test
+	public void testBuilder() {
+		InstrumentConfiguration conf = InstrumentConfiguration.builder()
+				.name("JUnit").unit("m/s").build();
 
-        String s = conf.toString();
-        assertThat(s, containsString("name=JUnit"));
-        assertThat(s, containsString("unit=m/s"));
-    }
+		String s = conf.toString();
+		assertThat(s, containsString("name=JUnit"));
+		assertThat(s, containsString("unit=m/s"));
+	}
 
 }

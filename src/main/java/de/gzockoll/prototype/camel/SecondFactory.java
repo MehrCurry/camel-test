@@ -6,11 +6,12 @@ package de.gzockoll.prototype.camel;
 
 import org.joda.time.DateTime;
 
-import de.gzockoll.prototype.camel.observation.Observation;
-import de.gzockoll.prototype.camel.observation.SimpleObservation;
+import de.gzockoll.observation.Observation;
+import de.gzockoll.observation.SimpleObservation;
 
 public class SecondFactory {
-    public static Observation getSeconds() {
-        return new SimpleObservation("sekunden", new DateTime().getSecondOfMinute());
-    }
+	public static Observation getSeconds() {
+		return new SimpleObservation("sekunden",
+				new DateTime().getSecondOfMinute());
+	}
 }
